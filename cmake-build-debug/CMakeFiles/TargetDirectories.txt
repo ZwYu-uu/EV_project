@@ -1,0 +1,3 @@
+/Users/ZwYu/CLionProjects/EV_project/cmake-build-debug/CMakeFiles/EV_project.dir
+/Users/ZwYu/CLionProjects/EV_project/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/ZwYu/CLionProjects/EV_project/cmake-build-debug/CMakeFiles/rebuild_cache.dir
