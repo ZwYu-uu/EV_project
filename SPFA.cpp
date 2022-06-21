@@ -3,14 +3,32 @@
 //
 #include "SPFA.h"
 
-SPFA::SPFA(int n, int m)
+SPFA::SPFA(int n)
 {
     this->n = n;
-    this->m = m;
-    memset(graph, inf, sizeof(graph));
-    memset(dis, inf, sizeof(dis));
-    memset(visited, false, sizeof(visited));
-    memset(pre, -1, sizeof(pre));
+    graph = new double *[n];
+    *graph = new double [n*n];
+    for (int i = 0; i < n; ++i)
+        *(graph+i) = *graph + i*n;
+    memset(*graph, inf, sizeof(double)*n*n);
+    dis = new double [n];
+    visited = new bool [n];
+    pre = new int [n];
+    memset(*graph, inf, sizeof(double)*n*n);
+    memset(dis, inf, sizeof(double)*n);
+    memset(visited, false, sizeof(bool)*n);
+    memset(pre, -1, sizeof(int)*n);
+//    std::cout<<"I am constructor!"<<std::endl;
+}
+
+SPFA::~SPFA()
+{
+    delete [] graph[0];
+    delete [] graph;
+    delete [] dis;
+    delete [] visited;
+    delete [] pre;
+//    std::cout<<"I am destructor!"<<std::endl;
 }
 
 void SPFA::InputAdjMat(int u, int v, double weight)

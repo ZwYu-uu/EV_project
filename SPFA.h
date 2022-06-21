@@ -27,13 +27,18 @@
 class SPFA
 {
 public:
-    int n, m, s, t;
-    double graph[maxn][maxn];
-    double dis[maxn];
-    int pre[maxn];
-    bool visited[maxn];
+    int n, s, t;
+    double **graph;
+    double *dis;
+    int *pre;
+    bool *visited;
+//    double graph[maxn][maxn];
+//    double dis[maxn];
+//    int pre[maxn];
+//    bool visited[maxn];
     SPFA(){};
-    SPFA(int n, int m);
+    SPFA(int n);
+    ~SPFA();
     void InputAdjMat(int u, int v, double weight);
     void SetSourceAndTank(int s, int t);
     void Getpath();
