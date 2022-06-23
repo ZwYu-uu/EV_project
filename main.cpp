@@ -10,8 +10,11 @@
 
 struct bus
 {
+    //The buses at both ATS and DL can be charged
     int CN; // Charger number
+    bool prime; // false: b; true: b'
     int ATS; // Available time slot
+    int DL; // deadline
     double ISoC; // Initial state of charge
 };
 
@@ -39,8 +42,13 @@ int buses_columns_cursor[number_bus] = {0}; // The cursor counts the number of c
 column_information total_columns [number_bus * 10000]; // The total number of columns is the sum of buses_columns_cursor[number_bus]
 double chi[number_bus * 10000]; // Store chi-variables
 int total_columns_cursor = 0; // Counter the number of total_columns
-double pi[number_bus + 2 * number_charger * number_time_slot + number_time_slot]; // Store the dual variables
-std::string constraints_names[number_bus + 2 * number_charger * number_time_slot + number_time_slot]; // The constraints names for pi
+//double pi[number_bus + 2 * number_charger * number_time_slot + number_time_slot]; // Store the dual variables
+//std::string constraints_names[number_bus + 2 * number_charger * number_time_slot + number_time_slot]; // The constraints names for pi
+
+double pi_1b[number_bus];
+double pi_1c[number_charger][number_time_slot];
+double pi_1d[number_charger][number_time_slot];
+double pi_1e[number_time_slot];
 
 double depo_power[number_time_slot]; // 6:00-22:00 is 700 kVA; 22:00-6:00 is 1400 kVA
 // time slot starts at 18:00
@@ -55,17 +63,17 @@ void initialize_chargers()
     }
 }
 
-void initialize_constraints_names()
-{
-    for (int i = 0; i < number_bus; ++i)
-        constraints_names[i] = "(1b) b=" + std::to_string(i);
-    for (int i = number_bus; i < number_bus + number_charger * number_time_slot; ++i)
-        constraints_names[i] = "(1c) c=" + std::to_string((i - number_bus) / number_time_slot) + " t=" + std::to_string((i - number_bus) % number_time_slot);
-    for (int i = number_bus + number_charger * number_time_slot; i < number_bus + 2 * number_charger * number_time_slot; ++i)
-        constraints_names[i] = "(1d) c=" + std::to_string((i - number_bus - number_charger * number_time_slot) / number_time_slot) + " t=" + std::to_string((i - number_bus + number_charger * number_time_slot) % number_time_slot);
-    for (int i = number_bus + 2 * number_charger * number_time_slot; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
-        constraints_names[i] = "(1e) t=" + std::to_string(i - number_bus - 2 * number_charger * number_time_slot);
-}
+//void initialize_constraints_names()
+//{
+//    for (int i = 0; i < number_bus; ++i)
+//        constraints_names[i] = "(1b) b=" + std::to_string(i);
+//    for (int i = number_bus; i < number_bus + number_charger * number_time_slot; ++i)
+//        constraints_names[i] = "(1c) c=" + std::to_string((i - number_bus) / number_time_slot) + " t=" + std::to_string((i - number_bus) % number_time_slot);
+//    for (int i = number_bus + number_charger * number_time_slot; i < number_bus + 2 * number_charger * number_time_slot; ++i)
+//        constraints_names[i] = "(1d) c=" + std::to_string((i - number_bus - number_charger * number_time_slot) / number_time_slot) + " t=" + std::to_string((i - number_bus + number_charger * number_time_slot) % number_time_slot);
+//    for (int i = number_bus + 2 * number_charger * number_time_slot; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
+//        constraints_names[i] = "(1e) t=" + std::to_string(i - number_bus - 2 * number_charger * number_time_slot);
+//}
 
 void initialize_depo_power() // Need to rewrite
 {
@@ -78,19 +86,27 @@ void initialize_depo_power() // Need to rewrite
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
     total_buses[0].CN = 0; // Charger number is 0
+    total_buses[0].prime = false; // is b
     total_buses[0].ATS = 0; // Available time slot is 0
-    total_buses[0].ISoC = 20.0; // Initial state of charge
+    total_buses[0].DL = number_time_slot;
+    total_buses[0].ISoC = 70.0; // Initial state of charge
 
     total_buses[1].CN = 0; // Charger number is 0
+    total_buses[1].prime = true; // is b'
     total_buses[1].ATS = 1; // Available time slot is 0
+    total_buses[1].DL = number_time_slot;
     total_buses[1].ISoC = 30.0; // Initial state of charge
 
     total_buses[2].CN = 1; // Charger number is 0
+    total_buses[2].prime = false; // is b
     total_buses[2].ATS = 1; // Available time slot is 0
+    total_buses[2].DL = number_time_slot;
     total_buses[2].ISoC = 36.0; // Initial state of charge
 
     total_buses[3].CN = 1; // Charger number is 0
+    total_buses[3].prime = true; // is b'
     total_buses[3].ATS = 2; // Available time slot is 0
+    total_buses[3].DL = number_time_slot;
     total_buses[3].ISoC = 28.0; // Initial state of charge
 }
 
@@ -115,7 +131,7 @@ void initialize_columns() // Initialize: to add all-zero columns
 void initialization()
 {
     initialize_chargers();
-    initialize_constraints_names();
+//    initialize_constraints_names();
     initialize_depo_power();
     initialize_total_buses();
     initialize_columns();
@@ -180,35 +196,82 @@ void solve_initial_LP()
         chi[i] = *(solution + i);
     const double* dualvariables;
     dualvariables = model.getRowPrice();
-    for (int i = 0; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
-        pi[i] = *(dualvariables + i);
+//    for (int i = 0; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
+//        pi[i] = *(dualvariables + i);
+    for (int i = 0; i < number_bus; ++i)
+        pi_1b[i] = *(dualvariables + i);
+    for (int i = 0; i < number_charger; ++i)
+        for (int j = 0; j < number_time_slot; ++j)
+            pi_1c[i][j] = *(dualvariables + number_bus + i * number_time_slot + j);
+    for (int i = 0; i < number_charger; ++i)
+        for (int j = 0; j < number_time_slot; ++j)
+            pi_1d[i][j] = *(dualvariables + number_bus + number_charger * number_time_slot + i * number_time_slot + j);
+    for (int i = 0; i < number_time_slot; ++i)
+        pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
+}
 
-//    int n = model.getNumCols();
-//    int m = model.getNumRows();
-    // The follows are the solution and dual variables
-
-//    if ( model.isProvenOptimal() )
-//    {
-//        std::cout << "Found optimal solution!" << std::endl;
-//        std::cout << "Objective value is " << model.getObjValue() << std::endl;
-//        const double* solution;
-//        solution = model.getColSolution();
-//        for (int i = 0; i < number_bus; ++i)
-//            chi[i] = *(solution + i);
-//        const double* dualvariables;
-//        dualvariables = model.getRowPrice();
-//        for (int i = 0; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
-//            pi[i] = *(dualvariables + i);
-//    }
-//    else
-//    {
-//        std::cout << "Didn’t find optimal solution." << std::endl;
-//    }
+void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
+{
+    int n = ceil((100 - total_buses[BN].ISoC) / energy_percent_every_time_slot); // The number of nodes in each time slot
+    int m = std::min(t_star, total_buses[BN].DL) - total_buses[BN].ATS + 1; // The number of time slots
+    int number_of_all_nodes = n * m + 2; // Adding two is for source and tank
+    SPFA graph(number_of_all_nodes);
+    graph.SetSourceAndTank(0, n * m + 1);
+    if (!total_buses[BN].prime) // b
+    {
+        graph.InputAdjMat(0, 1, 0);
+        graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][0] - pi_1e[0]);
+        graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][0] - 3 * pi_1e[0]);
+        for (int t = 1; t < m; ++t)
+            for (int node = 1; node < n + 1; ++node)
+            {
+                graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
+                if (node < n)
+                {
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][t] - pi_1e[t]);
+                }
+                if (node < n - 2)
+                {
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][t] - 3 * pi_1e[t]);
+                }
+            }
+        for (int i = 0; i < n; ++i)
+        {
+            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)) < 0? 0:(target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)));
+        }
+    }
+    else // b'
+    {
+        graph.InputAdjMat(0, 1, 0);
+        graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][0] - pi_1e[0]);
+        graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][0] - pi_1d[total_buses[BN].CN][0] - 3 * pi_1e[0]);
+        for (int t = 1; t < m; ++t)
+            for (int node = 1; node < n + 1; ++node)
+            {
+                graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
+                if (node < n)
+                {
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][t] - pi_1e[t]);
+                }
+                if (node < n - 2)
+                {
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][t] - pi_1d[total_buses[BN].CN][t] - 3 * pi_1e[t]);
+                }
+            }
+        for (int i = 0; i < n; ++i)
+        {
+            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)) < 0? 0:(target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)));
+        }
+    }
+    graph.Getpath();
+    graph.Getdistance();
 }
 
 int main()
 {
     initialization();
     solve_initial_LP();
+    get_min_reduced_cost_add_the_column(0, 2);
+
     return 0;
 }

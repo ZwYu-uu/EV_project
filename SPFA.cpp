@@ -74,16 +74,3 @@ double SPFA::Getdistance()
 {
     return dis[this->t];
 }
-
-//SPFA test(7, 9);
-//test.InputAdjMat(0, 1, -1);
-//test.InputAdjMat(0, 2, -2);
-//test.InputAdjMat(1, 3, -3);
-//test.InputAdjMat(1, 4, -4);
-//test.InputAdjMat(2, 4, -1);
-//test.InputAdjMat(2, 5, -2);
-//test.InputAdjMat(3, 6, -3);
-//test.InputAdjMat(4, 6, -4);
-//test.InputAdjMat(5, 6, -1);
-//test.SetSourceAndTank(0, 6);
-//test.Getpath();
