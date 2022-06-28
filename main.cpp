@@ -62,10 +62,14 @@ void initialize_depo_power() // Need to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 70.0);
-    total_buses[1] = Bus(0, true, 1, number_time_slot - 1, 30.0);
-    total_buses[2] = Bus(1, false, 1, number_time_slot - 1, 36.0);
-    total_buses[3] = Bus(1, true, 2, number_time_slot - 1, 28.0);
+    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 60.0);
+    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 72.0);
+    total_buses[2] = Bus(1, false, 3, number_time_slot - 1, 78.0);
+    total_buses[3] = Bus(1, true, 4, number_time_slot - 1, 34.0);
+//    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 70.0);
+//    total_buses[1] = Bus(0, true, 1, number_time_slot - 1, 30.0);
+//    total_buses[2] = Bus(1, false, 1, number_time_slot - 1, 36.0);
+//    total_buses[3] = Bus(1, true, 2, number_time_slot - 1, 28.0);
 }
 
 void initialize_columns() // Initialize: to add all-zero columns
@@ -172,6 +176,52 @@ void solve_initial_LP()
         pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
 }
 
+void add_column_to_model(rate_sequence new_column)
+{
+    int inx[number_of_row];
+    double el[number_of_row] = {0};
+    for (int i = 0; i < number_of_row; ++i)
+    {
+        inx[i] = i;
+    }
+    el[total_columns[total_columns_cursor].BN] = 1.0; // For constraint (1b)
+    if (!total_buses[total_columns[total_columns_cursor].BN].prime) // For constraints (1c) and (1d)
+    {
+        for (int t = 0; t < number_time_slot; ++t)
+        {
+            if (new_column.PR[t] == 150)
+            {
+                el[number_bus + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1.0;
+            }
+            if (new_column.PR[t] == 50)
+            {
+                el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1.0;
+            }
+        }
+    }
+    else
+    {
+        for (int t = 0; t < number_time_slot; ++t)  // For constraints (1c) and (1d)
+        {
+            if (new_column.PR[t] == 50 or new_column.PR[t] == 150)
+            {
+                el[number_bus + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1;
+            }
+            if (new_column.PR[t] == 150)
+            {
+                el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1;
+            }
+        }
+    }
+    for (int t = 0; t < number_time_slot; ++t) // For constraint (1e)
+    {
+        el[number_bus + 2 * number_time_slot * number_charger + t] = new_column.PR[t]/50.0;
+    }
+    CoinPackedVector col(number_of_row, inx, el);
+
+    model.addCol(col, 0.0, 1.0, new_column.delta);
+}
+
 void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
 {
     int n = ceil((100 - total_buses[BN].ISoC) / energy_percent_every_time_slot); // The number of nodes in each time slot
@@ -182,19 +232,19 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
     if (!total_buses[BN].prime) // b
     {
         graph.InputAdjMat(0, 1, 0);
-        graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][0] - pi_1e[0]);
-        graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][0] - 3 * pi_1e[0]);
+        graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
+        graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
         for (int t = 1; t < m; ++t)
             for (int node = 1; node < n + 1; ++node)
             {
                 graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
                 if (node < n)
                 {
-                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][t] - pi_1e[t]);
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
                 }
                 if (node < n - 2)
                 {
-                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][t] - 3 * pi_1e[t]);
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
                 }
             }
         for (int i = 0; i < n; ++i)
@@ -205,19 +255,19 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
     else // b'
     {
         graph.InputAdjMat(0, 1, 0);
-        graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][0] - pi_1e[0]);
-        graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][0] - pi_1d[total_buses[BN].CN][0] - 3 * pi_1e[0]);
+        graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
+        graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
         for (int t = 1; t < m; ++t)
             for (int node = 1; node < n + 1; ++node)
             {
                 graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
                 if (node < n)
                 {
-                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][t] - pi_1e[t]);
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
                 }
                 if (node < n - 2)
                 {
-                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][t] - pi_1d[total_buses[BN].CN][t] - 3 * pi_1e[t]);
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
                 }
             }
         for (int i = 0; i < n; ++i)
@@ -227,7 +277,7 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
     }
     graph.Getpath();
     graph.Getdistance();
-    if (graph.dis[number_of_all_nodes - 1] - pi_1b[BN] < 0)
+    if (graph.dis[number_of_all_nodes - 1] - pi_1b[BN] < 0 && abs(graph.dis[number_of_all_nodes - 1] - pi_1b[BN]) > 1e-6)
     {
         rate_sequence new_column;
         for (int t = 0; t < number_time_slot; ++t) // Initialize new_column
@@ -278,17 +328,48 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
         total_columns[total_columns_cursor].ColN = buses_columns_cursor[BN];
         total_columns[total_columns_cursor].delta = buses_columns[BN][buses_columns_cursor[BN]].delta;
 
+        add_column_to_model(new_column); // add column to the model
+
         total_columns_cursor++;
         buses_columns_cursor[BN]++;
     }
 }
 
+
+
 int main()
 {
     initialization();
     solve_initial_LP();
-    for (int b = 0; b < number_bus; ++b)
-        get_min_reduced_cost_add_the_column(b, 23);
+    // t_star should be greater than any ATS!
+    while (1)
+    {
+        for (int b = 0; b < number_bus; ++b)
+        {
+            get_min_reduced_cost_add_the_column(b, 6); //  t_star is included
+        }
+
+        model.resolve();
+
+        const double* solution;
+        solution = model.getColSolution();
+        for (int i = 0; i < total_columns_cursor; ++i)
+            chi[i] = *(solution + i);
+        const double* dualvariables;
+        dualvariables = model.getRowPrice();
+        for (int i = 0; i < number_bus; ++i)
+            pi_1b[i] = *(dualvariables + i);
+        for (int i = 0; i < number_charger; ++i)
+            for (int j = 0; j < number_time_slot; ++j)
+                pi_1c[i][j] = *(dualvariables + number_bus + i * number_time_slot + j);
+        for (int i = 0; i < number_charger; ++i)
+            for (int j = 0; j < number_time_slot; ++j)
+                pi_1d[i][j] = *(dualvariables + number_bus + number_charger * number_time_slot + i * number_time_slot + j);
+        for (int i = 0; i < number_time_slot; ++i)
+            pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
+
+
+    }
 
     return 0;
 }
