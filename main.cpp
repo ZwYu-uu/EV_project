@@ -6,22 +6,13 @@
 #include "CoinPackedMatrix.hpp"
 #include "CoinPackedVector.hpp"
 #include "parameters.h"
+#include "Bus.h"
 #include "SPFA.h"
-
-struct bus
-{
-    //The buses at both ATS and DL can be charged
-    int CN; // Charger number
-    bool prime; // false: b; true: b'
-    int ATS; // Available time slot
-    int DL; // deadline
-    double ISoC; // Initial state of charge
-};
 
 struct rate_sequence
 {
     int PR [number_time_slot]; // Power rates; rate: 0, 50, or 150
-    double SoC[number_time_slot]; // The state of charges; depend on the initial state and the rates array...
+    double SoC[number_time_slot + 1]; // The state of charges; depend on the initial state and the rates array...
     double delta;
 };
 
@@ -32,7 +23,7 @@ struct column_information
     double delta; // The corresponding delta
 };
 
-bus total_buses[number_bus]; // List of busus; pre-input information
+Bus total_buses[number_bus]; // List of busus; pre-input information
 int chargers[number_charger][2];
 
 rate_sequence buses_columns[number_bus][10000]; // Each bus has an array to store the columns (i.e., rate_sequence); Can use vector to automatically adapt
@@ -42,8 +33,6 @@ int buses_columns_cursor[number_bus] = {0}; // The cursor counts the number of c
 column_information total_columns [number_bus * 10000]; // The total number of columns is the sum of buses_columns_cursor[number_bus]
 double chi[number_bus * 10000]; // Store chi-variables
 int total_columns_cursor = 0; // Counter the number of total_columns
-//double pi[number_bus + 2 * number_charger * number_time_slot + number_time_slot]; // Store the dual variables
-//std::string constraints_names[number_bus + 2 * number_charger * number_time_slot + number_time_slot]; // The constraints names for pi
 
 double pi_1b[number_bus];
 double pi_1c[number_charger][number_time_slot];
@@ -63,18 +52,6 @@ void initialize_chargers()
     }
 }
 
-//void initialize_constraints_names()
-//{
-//    for (int i = 0; i < number_bus; ++i)
-//        constraints_names[i] = "(1b) b=" + std::to_string(i);
-//    for (int i = number_bus; i < number_bus + number_charger * number_time_slot; ++i)
-//        constraints_names[i] = "(1c) c=" + std::to_string((i - number_bus) / number_time_slot) + " t=" + std::to_string((i - number_bus) % number_time_slot);
-//    for (int i = number_bus + number_charger * number_time_slot; i < number_bus + 2 * number_charger * number_time_slot; ++i)
-//        constraints_names[i] = "(1d) c=" + std::to_string((i - number_bus - number_charger * number_time_slot) / number_time_slot) + " t=" + std::to_string((i - number_bus + number_charger * number_time_slot) % number_time_slot);
-//    for (int i = number_bus + 2 * number_charger * number_time_slot; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
-//        constraints_names[i] = "(1e) t=" + std::to_string(i - number_bus - 2 * number_charger * number_time_slot);
-//}
-
 void initialize_depo_power() // Need to rewrite
 {
     for (int i = 0; i < 8; ++i)
@@ -85,29 +62,10 @@ void initialize_depo_power() // Need to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-    total_buses[0].CN = 0; // Charger number is 0
-    total_buses[0].prime = false; // is b
-    total_buses[0].ATS = 0; // Available time slot is 0
-    total_buses[0].DL = number_time_slot;
-    total_buses[0].ISoC = 70.0; // Initial state of charge
-
-    total_buses[1].CN = 0; // Charger number is 0
-    total_buses[1].prime = true; // is b'
-    total_buses[1].ATS = 1; // Available time slot is 0
-    total_buses[1].DL = number_time_slot;
-    total_buses[1].ISoC = 30.0; // Initial state of charge
-
-    total_buses[2].CN = 1; // Charger number is 0
-    total_buses[2].prime = false; // is b
-    total_buses[2].ATS = 1; // Available time slot is 0
-    total_buses[2].DL = number_time_slot;
-    total_buses[2].ISoC = 36.0; // Initial state of charge
-
-    total_buses[3].CN = 1; // Charger number is 0
-    total_buses[3].prime = true; // is b'
-    total_buses[3].ATS = 2; // Available time slot is 0
-    total_buses[3].DL = number_time_slot;
-    total_buses[3].ISoC = 28.0; // Initial state of charge
+    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 70.0);
+    total_buses[1] = Bus(0, true, 1, number_time_slot - 1, 30.0);
+    total_buses[2] = Bus(1, false, 1, number_time_slot - 1, 36.0);
+    total_buses[3] = Bus(1, true, 2, number_time_slot - 1, 28.0);
 }
 
 void initialize_columns() // Initialize: to add all-zero columns
@@ -119,12 +77,16 @@ void initialize_columns() // Initialize: to add all-zero columns
             buses_columns[i][0].PR[j] = 0;
             buses_columns[i][0].SoC[j] = total_buses[i].ISoC;
         }
-        buses_columns[i][0].delta = target_state_of_charge - buses_columns[i][0].SoC[number_time_slot - 1] > 0 ? target_state_of_charge - buses_columns[i][0].SoC[number_time_slot - 1] : 0;
+        buses_columns[i][0].SoC[number_time_slot] = total_buses[i].ISoC;
+
+        buses_columns[i][0].delta = target_state_of_charge - buses_columns[i][0].SoC[number_time_slot] > 0 ? target_state_of_charge - buses_columns[i][0].SoC[number_time_slot - 1] : 0;
+
         total_columns[total_columns_cursor].BN = i;
         total_columns[total_columns_cursor].ColN = 0;
         total_columns[total_columns_cursor].delta = buses_columns[i][0].delta;
-        total_columns_cursor++;
-        buses_columns_cursor[i]++;
+
+        total_columns_cursor++; // point empty column
+        buses_columns_cursor[i]++; // point empty column
     }
 }
 
@@ -265,13 +227,68 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
     }
     graph.Getpath();
     graph.Getdistance();
+    if (graph.dis[number_of_all_nodes - 1] - pi_1b[BN] < 0)
+    {
+        rate_sequence new_column;
+        for (int t = 0; t < number_time_slot; ++t) // Initialize new_column
+        {
+            new_column.PR[t] = 0;
+            new_column.SoC[t] = total_buses[BN].ISoC;
+        }
+        new_column.SoC[number_time_slot] = total_buses[BN].ISoC;
+
+        int node_iter = graph.pre[number_of_all_nodes - 1];
+        int t = std::min(t_star, total_buses[BN].DL);
+        while (node_iter != 0)
+        {
+            if (node_iter > n)
+            {
+                if (node_iter - graph.pre[node_iter] - n == 3)
+                {
+                    new_column.PR[t] = 150;
+                }
+                else if (node_iter - graph.pre[node_iter] - n == 1)
+                {
+                    new_column.PR[t] = 50;
+                }
+                node_iter = graph.pre[node_iter];
+                t--;
+            }
+            else
+            {
+                if (node_iter - graph.pre[node_iter] == 4)
+                {
+                    new_column.PR[t] = 150;
+                }
+                else if (node_iter - graph.pre[node_iter] == 2)
+                {
+                    new_column.PR[t] = 50;
+                }
+                node_iter = graph.pre[node_iter];
+                t--;
+            }
+        }
+        for(int t = 1; t < number_time_slot + 1; ++t)
+            new_column.SoC[t] = new_column.SoC[t - 1] + energy_percent_every_time_slot * (new_column.PR[t - 1] / 50);
+        new_column.delta = target_state_of_charge - new_column.SoC[number_time_slot] > 0? target_state_of_charge - new_column.SoC[number_time_slot]:0;
+
+        buses_columns[BN][buses_columns_cursor[BN]] = new_column;
+
+        total_columns[total_columns_cursor].BN = BN;
+        total_columns[total_columns_cursor].ColN = buses_columns_cursor[BN];
+        total_columns[total_columns_cursor].delta = buses_columns[BN][buses_columns_cursor[BN]].delta;
+
+        total_columns_cursor++;
+        buses_columns_cursor[BN]++;
+    }
 }
 
 int main()
 {
     initialization();
     solve_initial_LP();
-    get_min_reduced_cost_add_the_column(0, 2);
+    for (int b = 0; b < number_bus; ++b)
+        get_min_reduced_cost_add_the_column(b, 23);
 
     return 0;
 }
