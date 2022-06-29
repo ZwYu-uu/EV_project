@@ -1,50 +1,16 @@
 // Use Column Generation with COIN-OR CLP to solve the Electric Vehicle Scheduling Problem
 // 2022.06.15 Zhanwei Yu
+
 #include <iostream>
 #include <string>
 #include <vector>
+#include "CbcModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "CoinPackedVector.hpp"
 #include "parameters.h"
 #include "Bus.h"
 #include "SPFA.h"
-
-class rate_sequence
-{
-public:
-    int PR [number_time_slot]; // Power rates; rate: 0, 50, or 150
-    double SoC[number_time_slot + 1]; // The state of charges; depend on the initial state and the rates array...
-    double delta;
-
-    rate_sequence(){};
-    rate_sequence(double ISoC) // All-zero constructor
-    {
-        for (int i = 0; i < number_time_slot; ++i)
-        {
-            this->PR[i] = 0;
-            this->SoC[i] = ISoC;
-        }
-        this->SoC[number_time_slot] = ISoC;
-        this->delta = target_state_of_charge - this->SoC[number_time_slot] > 0 ? target_state_of_charge - this->SoC[number_time_slot] : 0;
-    };
-};
-
-class column_information
-{
-public:
-    int BN; // Bus number
-    int ColN; // Column number (i.e., the index in the corresponding buses_columns[BN])
-    double delta; // The corresponding delta
-
-    column_information(){};
-    column_information(int BN, int ColN, double delta)
-    {
-        this->BN = BN;
-        this->ColN = ColN;
-        this->delta = delta;
-    }
-};
 
 Bus total_buses[number_bus]; // List of busus; pre-input information
 int chargers[number_charger][2]; // List of charger; pre-input information
@@ -165,8 +131,6 @@ void solve_initial_LP()
         chi[i] = *(solution + i);
     const double* dualvariables;
     dualvariables = model.getRowPrice();
-//    for (int i = 0; i < number_bus + 2 * number_charger * number_time_slot + number_time_slot; ++i)
-//        pi[i] = *(dualvariables + i);
     for (int i = 0; i < number_bus; ++i)
         pi_1b[i] = *(dualvariables + i);
     for (int i = 0; i < number_charger; ++i)
@@ -184,22 +148,16 @@ void add_column_to_model(rate_sequence new_column)
     int inx[number_of_row];
     double el[number_of_row] = {0};
     for (int i = 0; i < number_of_row; ++i)
-    {
         inx[i] = i;
-    }
     el[problem_columns[problem_columns.size() - 1].BN] = 1.0; // For constraint (1b)
     if (!total_buses[problem_columns[problem_columns.size() - 1].BN].prime) // For constraints (1c) and (1d)
     {
         for (int t = 0; t < number_time_slot; ++t)
         {
             if (new_column.PR[t] == 150)
-            {
                 el[number_bus + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1.0;
-            }
             if (new_column.PR[t] == 50)
-            {
                 el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1.0;
-            }
         }
     }
     else
@@ -207,19 +165,13 @@ void add_column_to_model(rate_sequence new_column)
         for (int t = 0; t < number_time_slot; ++t)  // For constraints (1c) and (1d)
         {
             if (new_column.PR[t] == 50 or new_column.PR[t] == 150)
-            {
                 el[number_bus + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1;
-            }
             if (new_column.PR[t] == 150)
-            {
                 el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1;
-            }
         }
     }
     for (int t = 0; t < number_time_slot; ++t) // For constraint (1e)
-    {
         el[number_bus + 2 * number_time_slot * number_charger + t] = new_column.PR[t]/50.0;
-    }
     CoinPackedVector col(number_of_row, inx, el);
 
     model.addCol(col, 0.0, 1.0, new_column.delta);
@@ -242,18 +194,12 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
             {
                 graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
                 if (node < n)
-                {
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
-                }
                 if (node < n - 2)
-                {
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
-                }
             }
         for (int i = 0; i < n; ++i)
-        {
             graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)) < 0? 0:(target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)));
-        }
     }
     else // b'
     {
@@ -265,18 +211,12 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
             {
                 graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
                 if (node < n)
-                {
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
-                }
                 if (node < n - 2)
-                {
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
-                }
             }
         for (int i = 0; i < n; ++i)
-        {
             graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)) < 0? 0:(target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)));
-        }
     }
     graph.Getpath();
     graph.Getdistance();
@@ -297,26 +237,18 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
             if (node_iter > n)
             {
                 if (node_iter - graph.pre[node_iter] - n == 3)
-                {
                     new_column.PR[t] = 150;
-                }
                 else if (node_iter - graph.pre[node_iter] - n == 1)
-                {
                     new_column.PR[t] = 50;
-                }
                 node_iter = graph.pre[node_iter];
                 t--;
             }
             else
             {
                 if (node_iter - graph.pre[node_iter] == 4)
-                {
                     new_column.PR[t] = 150;
-                }
                 else if (node_iter - graph.pre[node_iter] == 2)
-                {
                     new_column.PR[t] = 50;
-                }
                 node_iter = graph.pre[node_iter];
                 t--;
             }
@@ -325,9 +257,11 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
             new_column.SoC[t] = new_column.SoC[t - 1] + energy_percent_every_time_slot * (new_column.PR[t - 1] / 50);
         new_column.delta = target_state_of_charge - new_column.SoC[number_time_slot] > 0? target_state_of_charge - new_column.SoC[number_time_slot]:0;
 
+        // add to bus_columns and problem_columns
         bus_columns[BN].push_back(new_column);
         problem_columns.push_back(column_information(BN, bus_columns[BN].size() - 1, new_column.delta));
 
+        // add to the problem model
         add_column_to_model(new_column); // add column to the model
     }
 }
@@ -359,26 +293,26 @@ int main()
     initialization();
     solve_initial_LP();
     // t_star should be greater than any ATS!
-    int t_star = 5;
+    int t_star = 9;
     // First stage: add columns until that can not add
     bool flag_unchanged_columns = false;
     while (!flag_unchanged_columns)
     {
         int current_number_of_columns = problem_columns.size();
         for (int b = 0; b < number_bus; ++b)
-        {
             get_min_reduced_cost_add_the_column(b, t_star); //  t_star is included
-        }
         if (current_number_of_columns != problem_columns.size())
-        {
             resolve_LP();
-        }
         else
-        {
             flag_unchanged_columns = true;
-        }
     }
     // Second stage: round (fix) chi
-
+    for (int i = 0; i < problem_columns.size(); ++i)
+        model.setInteger(i);
+    CbcModel cbcmodel(model);
+    cbcmodel.branchAndBound();
+    const double* ILP_solution;
+    ILP_solution = cbcmodel.getCbcColSolution();
+    std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
     return 0;
 }
