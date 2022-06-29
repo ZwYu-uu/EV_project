@@ -2,6 +2,7 @@
 // 2022.06.15 Zhanwei Yu
 #include <iostream>
 #include <string>
+#include <vector>
 #include "OsiClpSolverInterface.hpp"
 #include "CoinPackedMatrix.hpp"
 #include "CoinPackedVector.hpp"
@@ -9,30 +10,50 @@
 #include "Bus.h"
 #include "SPFA.h"
 
-struct rate_sequence
+class rate_sequence
 {
+public:
     int PR [number_time_slot]; // Power rates; rate: 0, 50, or 150
     double SoC[number_time_slot + 1]; // The state of charges; depend on the initial state and the rates array...
     double delta;
+
+    rate_sequence(){};
+    rate_sequence(double ISoC) // All-zero constructor
+    {
+        for (int i = 0; i < number_time_slot; ++i)
+        {
+            this->PR[i] = 0;
+            this->SoC[i] = ISoC;
+        }
+        this->SoC[number_time_slot] = ISoC;
+        this->delta = target_state_of_charge - this->SoC[number_time_slot] > 0 ? target_state_of_charge - this->SoC[number_time_slot] : 0;
+    };
 };
 
-struct column_information
+class column_information
 {
+public:
     int BN; // Bus number
     int ColN; // Column number (i.e., the index in the corresponding buses_columns[BN])
     double delta; // The corresponding delta
+
+    column_information(){};
+    column_information(int BN, int ColN, double delta)
+    {
+        this->BN = BN;
+        this->ColN = ColN;
+        this->delta = delta;
+    }
 };
 
 Bus total_buses[number_bus]; // List of busus; pre-input information
-int chargers[number_charger][2];
+int chargers[number_charger][2]; // List of charger; pre-input information
 
-rate_sequence buses_columns[number_bus][10000]; // Each bus has an array to store the columns (i.e., rate_sequence); Can use vector to automatically adapt
-int buses_columns_cursor[number_bus] = {0}; // The cursor counts the number of columns of the buses; Initialization: All zero
+std::vector<std::vector<rate_sequence>> bus_columns(number_bus);
 
-// All the columns be added up by 1-dimension
-column_information total_columns [number_bus * 10000]; // The total number of columns is the sum of buses_columns_cursor[number_bus]
+std::vector<column_information> problem_columns; // give BN and ColN to record the columns
+
 double chi[number_bus * 10000]; // Store chi-variables
-int total_columns_cursor = 0; // Counter the number of total_columns
 
 double pi_1b[number_bus];
 double pi_1c[number_charger][number_time_slot];
@@ -66,38 +87,20 @@ void initialize_total_buses() // Need to rewrite via reading file to initialize
     total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 72.0);
     total_buses[2] = Bus(1, false, 3, number_time_slot - 1, 78.0);
     total_buses[3] = Bus(1, true, 4, number_time_slot - 1, 34.0);
-//    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 70.0);
-//    total_buses[1] = Bus(0, true, 1, number_time_slot - 1, 30.0);
-//    total_buses[2] = Bus(1, false, 1, number_time_slot - 1, 36.0);
-//    total_buses[3] = Bus(1, true, 2, number_time_slot - 1, 28.0);
 }
 
 void initialize_columns() // Initialize: to add all-zero columns
 {
     for (int i = 0; i < number_bus; ++i)
     {
-        for (int j = 0; j < number_time_slot; ++j)
-        {
-            buses_columns[i][0].PR[j] = 0;
-            buses_columns[i][0].SoC[j] = total_buses[i].ISoC;
-        }
-        buses_columns[i][0].SoC[number_time_slot] = total_buses[i].ISoC;
-
-        buses_columns[i][0].delta = target_state_of_charge - buses_columns[i][0].SoC[number_time_slot] > 0 ? target_state_of_charge - buses_columns[i][0].SoC[number_time_slot - 1] : 0;
-
-        total_columns[total_columns_cursor].BN = i;
-        total_columns[total_columns_cursor].ColN = 0;
-        total_columns[total_columns_cursor].delta = buses_columns[i][0].delta;
-
-        total_columns_cursor++; // point empty column
-        buses_columns_cursor[i]++; // point empty column
+        bus_columns[i].push_back(rate_sequence(total_buses[i].ISoC));
+        problem_columns.push_back(column_information(i, bus_columns[i].size() - 1, bus_columns[i][bus_columns[i].size() - 1].delta));
     }
 }
 
 void initialization()
 {
     initialize_chargers();
-//    initialize_constraints_names();
     initialize_depo_power();
     initialize_total_buses();
     initialize_columns();
@@ -112,7 +115,7 @@ void solve_initial_LP()
     double col_ub[number_bus];
     for (int i = 0; i < number_bus; ++i)
     {
-        objective[i] = total_columns[i].delta;
+        objective[i] = problem_columns[i].delta;
         col_lb[i] = 0.0; // 0 <= chi <= 1
         col_ub[i] = 1.0;
     }
@@ -184,18 +187,18 @@ void add_column_to_model(rate_sequence new_column)
     {
         inx[i] = i;
     }
-    el[total_columns[total_columns_cursor].BN] = 1.0; // For constraint (1b)
-    if (!total_buses[total_columns[total_columns_cursor].BN].prime) // For constraints (1c) and (1d)
+    el[problem_columns[problem_columns.size() - 1].BN] = 1.0; // For constraint (1b)
+    if (!total_buses[problem_columns[problem_columns.size() - 1].BN].prime) // For constraints (1c) and (1d)
     {
         for (int t = 0; t < number_time_slot; ++t)
         {
             if (new_column.PR[t] == 150)
             {
-                el[number_bus + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1.0;
+                el[number_bus + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1.0;
             }
             if (new_column.PR[t] == 50)
             {
-                el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1.0;
+                el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1.0;
             }
         }
     }
@@ -205,11 +208,11 @@ void add_column_to_model(rate_sequence new_column)
         {
             if (new_column.PR[t] == 50 or new_column.PR[t] == 150)
             {
-                el[number_bus + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1;
+                el[number_bus + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1;
             }
             if (new_column.PR[t] == 150)
             {
-                el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[total_columns[total_columns_cursor].BN].CN + t] = 1;
+                el[number_bus + number_time_slot * number_charger + number_time_slot * total_buses[problem_columns[problem_columns.size() - 1].BN].CN + t] = 1;
             }
         }
     }
@@ -322,54 +325,60 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
             new_column.SoC[t] = new_column.SoC[t - 1] + energy_percent_every_time_slot * (new_column.PR[t - 1] / 50);
         new_column.delta = target_state_of_charge - new_column.SoC[number_time_slot] > 0? target_state_of_charge - new_column.SoC[number_time_slot]:0;
 
-        buses_columns[BN][buses_columns_cursor[BN]] = new_column;
-
-        total_columns[total_columns_cursor].BN = BN;
-        total_columns[total_columns_cursor].ColN = buses_columns_cursor[BN];
-        total_columns[total_columns_cursor].delta = buses_columns[BN][buses_columns_cursor[BN]].delta;
+        bus_columns[BN].push_back(new_column);
+        problem_columns.push_back(column_information(BN, bus_columns[BN].size() - 1, new_column.delta));
 
         add_column_to_model(new_column); // add column to the model
-
-        total_columns_cursor++;
-        buses_columns_cursor[BN]++;
     }
 }
 
+void resolve_LP()
+{
+    model.resolve();
 
+    const double* solution;
+    solution = model.getColSolution();
+    for (int i = 0; i < problem_columns.size() - 1; ++i)
+        chi[i] = *(solution + i);
+    const double* dualvariables;
+    dualvariables = model.getRowPrice();
+    for (int i = 0; i < number_bus; ++i)
+        pi_1b[i] = *(dualvariables + i);
+    for (int i = 0; i < number_charger; ++i)
+        for (int j = 0; j < number_time_slot; ++j)
+            pi_1c[i][j] = *(dualvariables + number_bus + i * number_time_slot + j);
+    for (int i = 0; i < number_charger; ++i)
+        for (int j = 0; j < number_time_slot; ++j)
+            pi_1d[i][j] = *(dualvariables + number_bus + number_charger * number_time_slot + i * number_time_slot + j);
+    for (int i = 0; i < number_time_slot; ++i)
+        pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
+}
 
 int main()
 {
     initialization();
     solve_initial_LP();
     // t_star should be greater than any ATS!
-    while (1)
+    int t_star = 5;
+    // First stage: add columns until that can not add
+    bool flag_unchanged_columns = false;
+    while (!flag_unchanged_columns)
     {
+        int current_number_of_columns = problem_columns.size();
         for (int b = 0; b < number_bus; ++b)
         {
-            get_min_reduced_cost_add_the_column(b, 6); //  t_star is included
+            get_min_reduced_cost_add_the_column(b, t_star); //  t_star is included
         }
-
-        model.resolve();
-
-        const double* solution;
-        solution = model.getColSolution();
-        for (int i = 0; i < total_columns_cursor; ++i)
-            chi[i] = *(solution + i);
-        const double* dualvariables;
-        dualvariables = model.getRowPrice();
-        for (int i = 0; i < number_bus; ++i)
-            pi_1b[i] = *(dualvariables + i);
-        for (int i = 0; i < number_charger; ++i)
-            for (int j = 0; j < number_time_slot; ++j)
-                pi_1c[i][j] = *(dualvariables + number_bus + i * number_time_slot + j);
-        for (int i = 0; i < number_charger; ++i)
-            for (int j = 0; j < number_time_slot; ++j)
-                pi_1d[i][j] = *(dualvariables + number_bus + number_charger * number_time_slot + i * number_time_slot + j);
-        for (int i = 0; i < number_time_slot; ++i)
-            pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
-
-
+        if (current_number_of_columns != problem_columns.size())
+        {
+            resolve_LP();
+        }
+        else
+        {
+            flag_unchanged_columns = true;
+        }
     }
+    // Second stage: round (fix) chi
 
     return 0;
 }
