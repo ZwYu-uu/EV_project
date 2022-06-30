@@ -49,10 +49,23 @@ void initialize_depo_power() // Need to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 60.0);
-    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 72.0);
-    total_buses[2] = Bus(1, false, 3, number_time_slot - 1, 78.0);
-    total_buses[3] = Bus(1, true, 4, number_time_slot - 1, 34.0);
+    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 25.0);
+    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 25.0);
+    total_buses[2] = Bus(1, false, 3, number_time_slot - 1, 25.0);
+    total_buses[3] = Bus(1, true, 4, number_time_slot - 1, 25.0);
+    total_buses[4] = Bus(2, false, 2, number_time_slot - 1, 25.0);
+    total_buses[5] = Bus(2, true, 3, number_time_slot - 1, 25.0);
+    total_buses[6] = Bus(3, false, 5, number_time_slot - 1, 25.0);
+    total_buses[7] = Bus(3, true, 1, number_time_slot - 1, 25.0);
+    total_buses[8] = Bus(4, false, 10, number_time_slot - 1, 25.0);
+    total_buses[9] = Bus(4, true, 6, number_time_slot - 1, 25.0);
+    total_buses[10] = Bus(5, false, 7, number_time_slot - 1, 25.0);
+    total_buses[11] = Bus(5, true, 1, number_time_slot - 1, 25.0);
+    total_buses[12] = Bus(6, false, 10, number_time_slot - 1, 25.0);
+    total_buses[13] = Bus(6, true, 3, number_time_slot - 1, 25.0);
+    total_buses[14] = Bus(7, false, 12, number_time_slot - 1, 25.0);
+    total_buses[15] = Bus(7, true, 5, number_time_slot - 1, 25.0);
+
 }
 
 void initialize_columns() // Initialize: to add all-zero columns
@@ -272,7 +285,7 @@ void resolve_LP()
 
     const double* solution;
     solution = model.getColSolution();
-    for (int i = 0; i < problem_columns.size() - 1; ++i)
+    for (int i = 0; i < problem_columns.size(); ++i)
         chi[i] = *(solution + i);
     const double* dualvariables;
     dualvariables = model.getRowPrice();
@@ -288,12 +301,25 @@ void resolve_LP()
         pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
 }
 
+void use_BCB()
+{
+    for (int i = 0; i < problem_columns.size(); ++i)
+        model.setInteger(i);
+    CbcModel cbcmodel(model);
+//    cbcmodel.setLogLevel(0); // Don't print the log
+    cbcmodel.branchAndBound();
+    const double* ILP_solution;
+    ILP_solution = cbcmodel.getCbcColSolution();
+    std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
+}
+
 int main()
 {
+//    model.setLogLevel(0);
     initialization();
     solve_initial_LP();
     // t_star should be greater than any ATS!
-    int t_star = 9;
+    int t_star = 18;
     // First stage: add columns until that can not add
     bool flag_unchanged_columns = false;
     while (!flag_unchanged_columns)
@@ -306,13 +332,25 @@ int main()
         else
             flag_unchanged_columns = true;
     }
+//    model.writeLp("/Users/ZwYu/Desktop/LP_model");
+
     // Second stage: round (fix) chi
+    double possibility_of_rates[number_bus][number_time_slot][3] = {0};// 3 = {0, 50, 150}
+    double chi_bus[number_bus] = {0};
     for (int i = 0; i < problem_columns.size(); ++i)
-        model.setInteger(i);
-    CbcModel cbcmodel(model);
-    cbcmodel.branchAndBound();
-    const double* ILP_solution;
-    ILP_solution = cbcmodel.getCbcColSolution();
-    std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
+    {
+        int BN = problem_columns[i].BN;
+        int ColN = problem_columns[i].ColN;
+        chi_bus[BN] += chi[i];
+        for (int t = 0; t < number_time_slot; ++t)
+        {
+            if (bus_columns[BN][ColN].PR[t] == 0)
+                possibility_of_rates[BN][t][0] += chi[i];
+            if (bus_columns[BN][ColN].PR[t] == 50)
+                possibility_of_rates[BN][t][1] += chi[i];
+            if (bus_columns[BN][ColN].PR[t] == 150)
+                possibility_of_rates[BN][t][2] += chi[i];
+        }
+    }
     return 0;
 }

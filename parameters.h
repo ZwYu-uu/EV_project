@@ -5,7 +5,7 @@
 #ifndef EV_PROJECT_PARAMETERS_H
 #define EV_PROJECT_PARAMETERS_H
 
-#define number_bus 4
+#define number_bus 16
 #define number_charger number_bus/2
 #define number_time_slot 24 // 18:00 ~ 6:00; 24 = 12h / 30min
 #define target_state_of_charge 85
