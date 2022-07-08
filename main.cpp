@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iterator>
+#include <chrono>
 #include "CbcModel.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "CoinPackedMatrix.hpp"
@@ -49,31 +51,39 @@ void initialize_depo_power() // Need to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 25.0);
-    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 25.0);
-    total_buses[2] = Bus(1, false, 3, number_time_slot - 1, 25.0);
-    total_buses[3] = Bus(1, true, 4, number_time_slot - 1, 25.0);
-    total_buses[4] = Bus(2, false, 2, number_time_slot - 1, 25.0);
-    total_buses[5] = Bus(2, true, 3, number_time_slot - 1, 25.0);
-    total_buses[6] = Bus(3, false, 5, number_time_slot - 1, 25.0);
-    total_buses[7] = Bus(3, true, 1, number_time_slot - 1, 25.0);
-    total_buses[8] = Bus(4, false, 10, number_time_slot - 1, 25.0);
-    total_buses[9] = Bus(4, true, 6, number_time_slot - 1, 25.0);
-    total_buses[10] = Bus(5, false, 7, number_time_slot - 1, 25.0);
-    total_buses[11] = Bus(5, true, 1, number_time_slot - 1, 25.0);
-    total_buses[12] = Bus(6, false, 10, number_time_slot - 1, 25.0);
-    total_buses[13] = Bus(6, true, 3, number_time_slot - 1, 25.0);
-    total_buses[14] = Bus(7, false, 12, number_time_slot - 1, 25.0);
-    total_buses[15] = Bus(7, true, 5, number_time_slot - 1, 25.0);
+    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 25.0, 60.0);
+    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 12.0, 80.0);
+    total_buses[2] = Bus(1, false, 4, number_time_slot - 1, 32.0, 90.0);
+    total_buses[3] = Bus(1, true, 0, number_time_slot - 1, 14.0, 78.0);
+    total_buses[4] = Bus(2, false, 5, number_time_slot - 1, 8.0, 82.0);
+    total_buses[5] = Bus(2, true, 1, number_time_slot - 1, 24.0, 85.0);
+    total_buses[6] = Bus(3, false, 0, number_time_slot - 2, 21.0, 80.0);
+    total_buses[7] = Bus(3, true, 0, number_time_slot - 5, 16.0, 73.0);
+    total_buses[8] = Bus(4, false, 2, number_time_slot - 5, 8.0, 85.0);
+    total_buses[9] = Bus(4, true, 3, number_time_slot - 5, 12.0, 79.0);
+    total_buses[10] = Bus(5, false, 5, number_time_slot - 5, 55.0, 84.0);
+    total_buses[11] = Bus(5, true, 0, number_time_slot - 6, 23.0, 91.0);
+    total_buses[12] = Bus(6, false, 2, number_time_slot - 7, 21.0, 72.0);
+    total_buses[13] = Bus(6, true, 2, number_time_slot - 8, 35.0, 66.0);
+    total_buses[14] = Bus(7, false, 1, number_time_slot - 9, 10.0, 65.0);
+    total_buses[15] = Bus(7, true, 4, number_time_slot - 10, 21.0, 80.0);
+//    total_buses[16] = Bus(8, false, 0, number_time_slot - 1, 25.0);
+//    total_buses[17] = Bus(8, true, 2, number_time_slot - 1, 25.0);
+//    total_buses[18] = Bus(9, false, 3, number_time_slot - 1, 25.0);
+//    total_buses[19] = Bus(9, true, 4, number_time_slot - 1, 25.0);
+//    total_buses[20] = Bus(10, false, 2, number_time_slot - 1, 25.0);
+//    total_buses[21] = Bus(10, true, 3, number_time_slot - 1, 25.0);
+//    total_buses[22] = Bus(11, false, 5, number_time_slot - 1, 25.0);
+//    total_buses[23] = Bus(11, true, 5, number_time_slot - 1, 25.0);
 
 }
 
 void initialize_columns() // Initialize: to add all-zero columns
 {
-    for (int i = 0; i < number_bus; ++i)
+    for (int BN = 0; BN < number_bus; ++BN)
     {
-        bus_columns[i].push_back(rate_sequence(total_buses[i].ISoC));
-        problem_columns.push_back(column_information(i, bus_columns[i].size() - 1, bus_columns[i][bus_columns[i].size() - 1].delta));
+        bus_columns[BN].push_back(rate_sequence(total_buses[BN].ISoC, total_buses[BN].RSoC));
+        problem_columns.push_back(column_information(BN, bus_columns[BN].size() - 1, bus_columns[BN][bus_columns[BN].size() - 1].delta));
     }
 }
 
@@ -192,7 +202,22 @@ void add_column_to_model(rate_sequence new_column)
 
 void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
 {
-    int n = ceil((100 - total_buses[BN].ISoC) / energy_percent_every_time_slot); // The number of nodes in each time slot
+//    int n = ceil((100 - total_buses[BN].ISoC) / energy_percent_every_time_slot); // The number of nodes in each time slot
+    double node_corresponding_SoC[100];
+    node_corresponding_SoC[0] = total_buses[BN].ISoC;
+    int n = 1;
+    double SoC = total_buses[BN].ISoC;
+    while (SoC < 100)
+    {
+        if (SoC < 70)
+            SoC += energy_percent_every_time_slot_1;
+        else if (SoC < 80)
+            SoC += energy_percent_every_time_slot_2;
+        else
+            SoC += energy_percent_every_time_slot_3;
+        node_corresponding_SoC[n++] = SoC > 100? 100 : SoC;
+    }
+
     int m = std::min(t_star, total_buses[BN].DL) - total_buses[BN].ATS + 1; // The number of time slots
     int number_of_all_nodes = n * m + 2; // Adding two is for source and tank
     SPFA graph(number_of_all_nodes);
@@ -212,7 +237,7 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
             }
         for (int i = 0; i < n; ++i)
-            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)) < 0? 0:(target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)));
+            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (total_buses[BN].RSoC - node_corresponding_SoC[i] ) < 0? 0 : (total_buses[BN].RSoC - node_corresponding_SoC[i]));
     }
     else // b'
     {
@@ -229,7 +254,7 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
             }
         for (int i = 0; i < n; ++i)
-            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)) < 0? 0:(target_state_of_charge - (total_buses[BN].ISoC + i * energy_percent_every_time_slot)));
+            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (total_buses[BN].RSoC - node_corresponding_SoC[i]) < 0? 0:(total_buses[BN].RSoC - node_corresponding_SoC[i]));
     }
     graph.Getpath();
     graph.Getdistance();
@@ -266,9 +291,16 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
                 t--;
             }
         }
+        int cursor = 0;
         for(int t = 1; t < number_time_slot + 1; ++t)
-            new_column.SoC[t] = new_column.SoC[t - 1] + energy_percent_every_time_slot * (new_column.PR[t - 1] / 50);
-        new_column.delta = target_state_of_charge - new_column.SoC[number_time_slot] > 0? target_state_of_charge - new_column.SoC[number_time_slot]:0;
+        {
+            if (new_column.PR[t - 1] == 50)
+                cursor++;
+            if (new_column.PR[t - 1] == 150)
+                cursor += 3;
+            new_column.SoC[t] = node_corresponding_SoC[cursor];
+        }
+        new_column.delta = total_buses[BN].RSoC - new_column.SoC[number_time_slot] > 0? total_buses[BN].RSoC - new_column.SoC[number_time_slot]:0;
 
         // add to bus_columns and problem_columns
         bus_columns[BN].push_back(new_column);
@@ -313,13 +345,20 @@ void use_BCB()
     std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
 }
 
+bool cmp(round_indicator A, round_indicator B)
+{
+    if (A.probability != B.probability)
+        return A.probability > B.probability;
+}
+
 int main()
 {
+    auto start = std::chrono::high_resolution_clock::now();
 //    model.setLogLevel(0);
     initialization();
     solve_initial_LP();
     // t_star should be greater than any ATS!
-    int t_star = 18;
+    int t_star = 35;
     // First stage: add columns until that can not add
     bool flag_unchanged_columns = false;
     while (!flag_unchanged_columns)
@@ -336,12 +375,14 @@ int main()
 
     // Second stage: round (fix) chi
     double possibility_of_rates[number_bus][number_time_slot][3] = {0};// 3 = {0, 50, 150}
-    double chi_bus[number_bus] = {0};
+    int fixed_decisions[number_bus][number_time_slot];
+    memset(fixed_decisions, -1, sizeof(fixed_decisions));
+    std::vector<round_indicator> to_be_fixed_decisions; // to store decisions whose sigma_chi < 0.99
+    // calculate the indicators
     for (int i = 0; i < problem_columns.size(); ++i)
     {
         int BN = problem_columns[i].BN;
         int ColN = problem_columns[i].ColN;
-        chi_bus[BN] += chi[i];
         for (int t = 0; t < number_time_slot; ++t)
         {
             if (bus_columns[BN][ColN].PR[t] == 0)
@@ -352,5 +393,65 @@ int main()
                 possibility_of_rates[BN][t][2] += chi[i];
         }
     }
+    // fix the decisions that are one
+    for (int BN = 0; BN < number_bus; ++BN)
+        for (int t = 0; t < number_time_slot; ++t)
+            for (int rate = 0; rate < 3; ++rate) // 0:0, 1:50, 2:150.
+            {
+                double possibility = possibility_of_rates[BN][t][rate];
+                if (0.99 <= possibility && possibility <=1)
+                    fixed_decisions[BN][t] = rate;
+                else if (possibility > 0)
+                    to_be_fixed_decisions.push_back(round_indicator(BN, t, rate, possibility));
+            }
+    // delete the violating columns
+    for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();)
+    {
+        int BN = it->BN;
+        int ColN = it->ColN;
+        for (int t = 0; t < number_time_slot; ++t)
+        {
+            if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
+            {
+                int index = std::distance(problem_columns.begin(), it);
+                int col[1];
+                col[0] = index;
+                model.deleteCols(1, col);
+                it = problem_columns.erase(it);
+                it--;
+                break;
+            }
+            if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
+            {
+                int index = std::distance(problem_columns.begin(), it);
+                int col[1];
+                col[0] = index;
+                model.deleteCols(1, col);
+                it = problem_columns.erase(it);
+                it--;
+                break;
+            }
+            if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
+            {
+                int index = std::distance(problem_columns.begin(), it);
+                int col[1];
+                col[0] = index;
+                model.deleteCols(1, col);
+                it = problem_columns.erase(it);
+                it--;
+                break;
+            }
+        }
+        it++;
+    }
+    // find the most closed to one or zero to fix
+//    std::sort(to_be_fixed_decisions.begin(), to_be_fixed_decisions.end(), cmp);
+    // resolve the problem to get the values of the dual variables
+    model.resolve();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = (end - start).count();
+    std::cout << "Running time: " <<std::setprecision(10)<< duration / 1000000.0 << "ms" << std::endl;
+
     return 0;
 }

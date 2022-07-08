@@ -16,9 +16,10 @@ public:
     int ATS; // Available time slot
     int DL; // deadline
     double ISoC; // Initial state of charge
+    double RSoC; // Required state of charge
 
     Bus();
-    Bus(int CN, bool prime, int ATS, int DL, double ISoC);
+    Bus(int CN, bool prime, int ATS, int DL, double ISoC, double RSoC);
 };
 
 class rate_sequence
@@ -29,7 +30,7 @@ public:
     double delta;
 
     rate_sequence();
-    rate_sequence(double ISoC); // All zero power rates constructor
+    rate_sequence(double ISoC, double RSoC); // All zero power rates constructor
 };
 
 class column_information
@@ -42,5 +43,18 @@ public:
     column_information();
     column_information(int BN, int ColN, double delta);
 };
+
+class round_indicator
+{
+public:
+    int BN;
+    int t;
+    int rate;
+    double probability;
+
+    round_indicator();
+    round_indicator(int BN, int t, int rate, double probability);
+};
+
 
 #endif //EV_PROJECT_BUS_H
