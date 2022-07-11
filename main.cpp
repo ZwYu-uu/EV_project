@@ -31,6 +31,8 @@ double pi_1e[number_time_slot];
 double depo_power[number_time_slot]; // 6:00-22:00 is 700 kVA; 22:00-6:00 is 1400 kVA
 // time slot starts at 18:00
 
+int fixed_decisions[number_bus][number_time_slot];
+
 void initialize_chargers()
 {
     int bus_n = 0;
@@ -51,22 +53,22 @@ void initialize_depo_power() // Need to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 25.0, 60.0);
-    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 12.0, 80.0);
-    total_buses[2] = Bus(1, false, 4, number_time_slot - 1, 32.0, 90.0);
-    total_buses[3] = Bus(1, true, 0, number_time_slot - 1, 14.0, 78.0);
-    total_buses[4] = Bus(2, false, 5, number_time_slot - 1, 8.0, 82.0);
-    total_buses[5] = Bus(2, true, 1, number_time_slot - 1, 24.0, 85.0);
-    total_buses[6] = Bus(3, false, 0, number_time_slot - 2, 21.0, 80.0);
-    total_buses[7] = Bus(3, true, 0, number_time_slot - 5, 16.0, 73.0);
-    total_buses[8] = Bus(4, false, 2, number_time_slot - 5, 8.0, 85.0);
-    total_buses[9] = Bus(4, true, 3, number_time_slot - 5, 12.0, 79.0);
-    total_buses[10] = Bus(5, false, 5, number_time_slot - 5, 55.0, 84.0);
-    total_buses[11] = Bus(5, true, 0, number_time_slot - 6, 23.0, 91.0);
-    total_buses[12] = Bus(6, false, 2, number_time_slot - 7, 21.0, 72.0);
-    total_buses[13] = Bus(6, true, 2, number_time_slot - 8, 35.0, 66.0);
-    total_buses[14] = Bus(7, false, 1, number_time_slot - 9, 10.0, 65.0);
-    total_buses[15] = Bus(7, true, 4, number_time_slot - 10, 21.0, 80.0);
+    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 25.0, 85.0);
+    total_buses[1] = Bus(0, true, 2, number_time_slot - 1, 26.0, 84.0);
+    total_buses[2] = Bus(1, false, 4, number_time_slot - 1, 27.0, 81.0);
+    total_buses[3] = Bus(1, true, 0, number_time_slot - 1, 25.0, 80.0);
+    total_buses[4] = Bus(2, false, 5, number_time_slot - 1, 29.0, 85.0);
+    total_buses[5] = Bus(2, true, 1, number_time_slot - 1, 26.0, 82.0);
+    total_buses[6] = Bus(3, false, 0, number_time_slot - 2, 29.0, 83.0);
+    total_buses[7] = Bus(3, true, 0, number_time_slot - 5, 26.0, 82.0);
+    total_buses[8] = Bus(4, false, 2, number_time_slot - 5, 27.0, 81.0);
+    total_buses[9] = Bus(4, true, 3, number_time_slot - 5, 28.0, 83.0);
+//    total_buses[10] = Bus(5, false, 5, number_time_slot - 5, 55.0, 84.0);
+//    total_buses[11] = Bus(5, true, 0, number_time_slot - 6, 23.0, 91.0);
+//    total_buses[12] = Bus(6, false, 2, number_time_slot - 7, 21.0, 72.0);
+//    total_buses[13] = Bus(6, true, 2, number_time_slot - 8, 35.0, 66.0);
+//    total_buses[14] = Bus(7, false, 1, number_time_slot - 9, 10.0, 65.0);
+//    total_buses[15] = Bus(7, true, 4, number_time_slot - 10, 21.0, 80.0);
 //    total_buses[16] = Bus(8, false, 0, number_time_slot - 1, 25.0);
 //    total_buses[17] = Bus(8, true, 2, number_time_slot - 1, 25.0);
 //    total_buses[18] = Bus(9, false, 3, number_time_slot - 1, 25.0);
@@ -75,7 +77,7 @@ void initialize_total_buses() // Need to rewrite via reading file to initialize
 //    total_buses[21] = Bus(10, true, 3, number_time_slot - 1, 25.0);
 //    total_buses[22] = Bus(11, false, 5, number_time_slot - 1, 25.0);
 //    total_buses[23] = Bus(11, true, 5, number_time_slot - 1, 25.0);
-
+    memset(fixed_decisions, -1, sizeof(fixed_decisions));
 }
 
 void initialize_columns() // Initialize: to add all-zero columns
@@ -311,6 +313,222 @@ void get_min_reduced_cost_add_the_column(int BN, int t_star) // BN = bus number
     }
 }
 
+void get_min_reduced_cost_add_the_column_fixed_version(int BN, int t_star) // BN = bus number
+{
+//    int n = ceil((100 - total_buses[BN].ISoC) / energy_percent_every_time_slot); // The number of nodes in each time slot
+    double node_corresponding_SoC[100];
+    node_corresponding_SoC[0] = total_buses[BN].ISoC;
+    int n = 1;
+    double SoC = total_buses[BN].ISoC;
+    while (SoC < 100)
+    {
+        if (SoC < 70)
+            SoC += energy_percent_every_time_slot_1;
+        else if (SoC < 80)
+            SoC += energy_percent_every_time_slot_2;
+        else
+            SoC += energy_percent_every_time_slot_3;
+        node_corresponding_SoC[n++] = SoC > 100? 100 : SoC;
+    }
+
+    int m = std::min(t_star, total_buses[BN].DL) - total_buses[BN].ATS + 1; // The number of time slots
+    int number_of_all_nodes = n * m + 2; // Adding two is for source and tank
+    SPFA graph(number_of_all_nodes);
+    graph.SetSourceAndTank(0, n * m + 1);
+    if (!total_buses[BN].prime) // b
+    {
+        if (fixed_decisions[BN][0] == -1)
+        {
+            graph.InputAdjMat(0, 1, 0);
+            graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
+            graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
+        }
+        else if (fixed_decisions[BN][0] == 0)
+            graph.InputAdjMat(0, 1, 0);
+        else if (fixed_decisions[BN][0] == 1)
+            graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
+        else if (fixed_decisions[BN][0] == 2)
+            graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
+
+        for (int t = 1; t < m; ++t) // if m = 1, then skip this process
+            for (int node = 1; node < n + 1; ++node)
+            {
+                if (fixed_decisions[BN][0] == -1)
+                {
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
+                    if (node < n)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
+                    if (node < n - 2)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
+                }
+                else if (fixed_decisions[BN][0] == 0)
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
+                else if (fixed_decisions[BN][0] == 1)
+                {
+                    if (node < n)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
+                }
+                else if (fixed_decisions[BN][0] == 2)
+                {
+                    if (node < n - 2)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
+                }
+            }
+
+        for (int i = 0; i < n; ++i)
+            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (total_buses[BN].RSoC - node_corresponding_SoC[i] ) < 0? 0 : (total_buses[BN].RSoC - node_corresponding_SoC[i]));
+    }
+    else // b'
+    {
+        if (fixed_decisions[BN][0] == -1)
+        {
+            graph.InputAdjMat(0, 1, 0);
+            graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
+            graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
+        }
+        else if (fixed_decisions[BN][0] == 0)
+            graph.InputAdjMat(0, 1, 0);
+        else if (fixed_decisions[BN][0] == 1)
+            graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
+        else if (fixed_decisions[BN][0] == 2)
+            graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
+
+        for (int t = 1; t < m; ++t)
+            for (int node = 1; node < n + 1; ++node)
+            {
+                if (fixed_decisions[BN][0] == -1)
+                {
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
+                    if (node < n)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
+                    if (node < n - 2)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
+                }
+                else if (fixed_decisions[BN][0] == 0)
+                    graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
+                else if (fixed_decisions[BN][0] == 1)
+                {
+                    if (node < n)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
+                }
+                else if (fixed_decisions[BN][0] == 2)
+                {
+                    if (node < n - 2)
+                        graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
+                }
+            }
+        for (int i = 0; i < n; ++i)
+            graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (total_buses[BN].RSoC - node_corresponding_SoC[i]) < 0? 0:(total_buses[BN].RSoC - node_corresponding_SoC[i]));
+    }
+    graph.Getpath();
+    graph.Getdistance();
+    if (graph.dis[number_of_all_nodes - 1] - pi_1b[BN] < 0 && abs(graph.dis[number_of_all_nodes - 1] - pi_1b[BN]) > 1e-6)
+    {
+        rate_sequence new_column;
+        for (int t = 0; t < number_time_slot; ++t) // Initialize new_column
+        {
+            new_column.PR[t] = 0;
+            new_column.SoC[t] = total_buses[BN].ISoC;
+        }
+        new_column.SoC[number_time_slot] = total_buses[BN].ISoC;
+
+        int node_iter = graph.pre[number_of_all_nodes - 1];
+        int t = std::min(t_star, total_buses[BN].DL);
+        while (node_iter != 0)
+        {
+            if (node_iter > n)
+            {
+                if (node_iter - graph.pre[node_iter] - n == 3)
+                    new_column.PR[t] = 150;
+                else if (node_iter - graph.pre[node_iter] - n == 1)
+                    new_column.PR[t] = 50;
+                node_iter = graph.pre[node_iter];
+                t--;
+            }
+            else
+            {
+                if (node_iter - graph.pre[node_iter] == 4)
+                    new_column.PR[t] = 150;
+                else if (node_iter - graph.pre[node_iter] == 2)
+                    new_column.PR[t] = 50;
+                node_iter = graph.pre[node_iter];
+                t--;
+            }
+        }
+        int cursor = 0;
+        for(int t = 1; t < number_time_slot + 1; ++t)
+        {
+            if (new_column.PR[t - 1] == 50)
+                cursor++;
+            if (new_column.PR[t - 1] == 150)
+                cursor += 3;
+            new_column.SoC[t] = node_corresponding_SoC[cursor];
+        }
+        new_column.delta = total_buses[BN].RSoC - new_column.SoC[number_time_slot] > 0? total_buses[BN].RSoC - new_column.SoC[number_time_slot]:0;
+
+        // add to bus_columns and problem_columns
+        bus_columns[BN].push_back(new_column);
+        problem_columns.push_back(column_information(BN, bus_columns[BN].size() - 1, new_column.delta));
+
+        // add to the problem model
+        add_column_to_model(new_column); // add column to the model
+    }
+}
+
+void add_extra_column(int BN)
+{
+    double node_corresponding_SoC[100];
+    node_corresponding_SoC[0] = total_buses[BN].ISoC;
+    int n = 1;
+    double SoC = total_buses[BN].ISoC;
+    while (SoC < 100)
+    {
+        if (SoC < 70)
+            SoC += energy_percent_every_time_slot_1;
+        else if (SoC < 80)
+            SoC += energy_percent_every_time_slot_2;
+        else
+            SoC += energy_percent_every_time_slot_3;
+        node_corresponding_SoC[n++] = SoC > 100? 100 : SoC;
+    }
+
+    rate_sequence new_column;
+    for (int t = 0; t < number_time_slot; ++t) // Initialize new_column
+    {
+        new_column.PR[t] = 0;
+        new_column.SoC[t] = total_buses[BN].ISoC;
+    }
+    new_column.SoC[number_time_slot] = total_buses[BN].ISoC;
+
+    for (int t = 0; t < number_time_slot; ++t)
+    {
+        if (fixed_decisions[BN][t] == 1)
+            new_column.PR[t] = 50;
+        if (fixed_decisions[BN][t] == 2)
+            new_column.PR[t] = 150;
+    }
+
+    int cursor = 0;
+    for (int t = 1; t < number_time_slot + 1; ++t)
+    {
+        if (new_column.PR[t - 1] == 50)
+            cursor++;
+        if (new_column.PR[t - 1] == 150)
+            cursor += 3;
+        new_column.SoC[t] = node_corresponding_SoC[cursor];
+    }
+
+    new_column.delta = total_buses[BN].RSoC - new_column.SoC[number_time_slot] > 0? total_buses[BN].RSoC - new_column.SoC[number_time_slot]:0;
+
+    // add to bus_columns and problem_columns
+    bus_columns[BN].push_back(new_column);
+    problem_columns.push_back(column_information(BN, bus_columns[BN].size() - 1, new_column.delta));
+
+    // add to the problem model
+    add_column_to_model(new_column); // add column to the model
+
+}
+
 void resolve_LP()
 {
     model.resolve();
@@ -349,16 +567,32 @@ bool cmp(round_indicator A, round_indicator B)
 {
     if (A.probability != B.probability)
         return A.probability > B.probability;
+    else
+        return false;
+}
+
+bool if_satisfy_constraints(int BN, int t, int rate)
+{
+    int other_BN = BN % 2 ? BN - 1: BN + 1;
+    if (rate == 1)
+        if (fixed_decisions[other_BN][t] == 2)
+            return false;
+    if (rate == 2)
+        if (fixed_decisions[other_BN][t] == 1 || fixed_decisions[other_BN][t] == 2)
+            return false;
+    return true;
 }
 
 int main()
 {
-    auto start = std::chrono::high_resolution_clock::now();
+//    auto start = std::chrono::high_resolution_clock::now();
 //    model.setLogLevel(0);
+
+    int t_star = 40;
+
     initialization();
     solve_initial_LP();
     // t_star should be greater than any ATS!
-    int t_star = 35;
     // First stage: add columns until that can not add
     bool flag_unchanged_columns = false;
     while (!flag_unchanged_columns)
@@ -374,84 +608,126 @@ int main()
 //    model.writeLp("/Users/ZwYu/Desktop/LP_model");
 
     // Second stage: round (fix) chi
-    double possibility_of_rates[number_bus][number_time_slot][3] = {0};// 3 = {0, 50, 150}
-    int fixed_decisions[number_bus][number_time_slot];
-    memset(fixed_decisions, -1, sizeof(fixed_decisions));
+    double possibility_of_rates[number_bus][number_time_slot][3];// 3 = {0, 50, 150}
     std::vector<round_indicator> to_be_fixed_decisions; // to store decisions whose sigma_chi < 0.99
-    // calculate the indicators
-    for (int i = 0; i < problem_columns.size(); ++i)
-    {
-        int BN = problem_columns[i].BN;
-        int ColN = problem_columns[i].ColN;
-        for (int t = 0; t < number_time_slot; ++t)
-        {
-            if (bus_columns[BN][ColN].PR[t] == 0)
-                possibility_of_rates[BN][t][0] += chi[i];
-            if (bus_columns[BN][ColN].PR[t] == 50)
-                possibility_of_rates[BN][t][1] += chi[i];
-            if (bus_columns[BN][ColN].PR[t] == 150)
-                possibility_of_rates[BN][t][2] += chi[i];
-        }
-    }
-    // fix the decisions that are one
-    for (int BN = 0; BN < number_bus; ++BN)
-        for (int t = 0; t < number_time_slot; ++t)
-            for (int rate = 0; rate < 3; ++rate) // 0:0, 1:50, 2:150.
-            {
-                double possibility = possibility_of_rates[BN][t][rate];
-                if (0.99 <= possibility && possibility <=1)
-                    fixed_decisions[BN][t] = rate;
-                else if (possibility > 0)
-                    to_be_fixed_decisions.push_back(round_indicator(BN, t, rate, possibility));
-            }
-    // delete the violating columns
-    for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();)
-    {
-        int BN = it->BN;
-        int ColN = it->ColN;
-        for (int t = 0; t < number_time_slot; ++t)
-        {
-            if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
-            {
-                int index = std::distance(problem_columns.begin(), it);
-                int col[1];
-                col[0] = index;
-                model.deleteCols(1, col);
-                it = problem_columns.erase(it);
-                it--;
-                break;
-            }
-            if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
-            {
-                int index = std::distance(problem_columns.begin(), it);
-                int col[1];
-                col[0] = index;
-                model.deleteCols(1, col);
-                it = problem_columns.erase(it);
-                it--;
-                break;
-            }
-            if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
-            {
-                int index = std::distance(problem_columns.begin(), it);
-                int col[1];
-                col[0] = index;
-                model.deleteCols(1, col);
-                it = problem_columns.erase(it);
-                it--;
-                break;
-            }
-        }
-        it++;
-    }
-    // find the most closed to one or zero to fix
-//    std::sort(to_be_fixed_decisions.begin(), to_be_fixed_decisions.end(), cmp);
-    // resolve the problem to get the values of the dual variables
-    model.resolve();
 
-    auto end = std::chrono::high_resolution_clock::now();
-    auto duration = (end - start).count();
-    std::cout << "Running time: " <<std::setprecision(10)<< duration / 1000000.0 << "ms" << std::endl;
+    int test = 10000;
+    while (test--)
+    {
+        memset(possibility_of_rates, 0, sizeof(possibility_of_rates));
+        to_be_fixed_decisions.clear();
+        for (int i = 0; i < problem_columns.size(); ++i) // calculate the indicators
+        {
+            int BN = problem_columns[i].BN;
+            int ColN = problem_columns[i].ColN;
+            for (int t = 0; t < number_time_slot; ++t)
+            {
+                if (bus_columns[BN][ColN].PR[t] == 0)
+                    possibility_of_rates[BN][t][0] += chi[i];
+                if (bus_columns[BN][ColN].PR[t] == 50)
+                    possibility_of_rates[BN][t][1] += chi[i];
+                if (bus_columns[BN][ColN].PR[t] == 150)
+                    possibility_of_rates[BN][t][2] += chi[i];
+            }
+        }
+        // fix the decisions that are one
+        for (int BN = 0; BN < number_bus; ++BN)
+            for (int t = 0; t < number_time_slot; ++t)
+                for (int rate = 0; rate < 3; ++rate) // 0:0, 1:50, 2:150.
+                {
+                    double possibility = possibility_of_rates[BN][t][rate];
+                    if (0.99 <= possibility && fixed_decisions[BN][t] == -1)
+                        fixed_decisions[BN][t] = rate; // 0, 1, 2 = 0, 50, 150 needs to be unified later..
+                    else if (possibility > 0 && fixed_decisions[BN][t] == -1)
+                        to_be_fixed_decisions.push_back(round_indicator(BN, t, rate, possibility));
+                }
+        // find the most possible variable to fix
+        std::sort(to_be_fixed_decisions.begin(), to_be_fixed_decisions.end(), cmp);
+        if (to_be_fixed_decisions.size() > 1) // fix process
+        {
+            for (int i = 0; i < to_be_fixed_decisions.size(); ++i)
+            {
+                int BN = to_be_fixed_decisions[i].BN;
+                int t = to_be_fixed_decisions[i].t;
+                int rate = to_be_fixed_decisions[i].rate;
+                if (if_satisfy_constraints(BN, t, rate))
+                {
+                    fixed_decisions[BN][t] = rate; // 0, 1, 2 (not 0, 50, 150) needs to be unified later...
+                    break;
+                }
+            }
+        }
+        else
+        {
+            std::cout<<"There are no to be fixed decisions!"<<std::endl; // in case...
+            break;
+        }
+        // delete the violating columns
+        for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();) // here all-zero columns always exist
+        {
+            int BN = it->BN;
+            int ColN = it->ColN;
+            for (int t = 0; t < number_time_slot; ++t)
+            {
+                if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
+                {
+                    int index = std::distance(problem_columns.begin(), it);
+                    int col[1];
+                    col[0] = index;
+                    model.deleteCols(1, col);
+                    it = problem_columns.erase(it);
+                    it--;
+                    break;
+                }
+                if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
+                {
+                    int index = std::distance(problem_columns.begin(), it);
+                    int col[1];
+                    col[0] = index;
+                    model.deleteCols(1, col);
+                    it = problem_columns.erase(it);
+                    it--;
+                    break;
+                }
+                if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
+                {
+                    int index = std::distance(problem_columns.begin(), it);
+                    int col[1];
+                    col[0] = index;
+                    model.deleteCols(1, col);
+                    it = problem_columns.erase(it);
+                    it--;
+                    break;
+                }
+            }
+            it++;
+        }
+
+        for (int BN = 0; BN < number_bus; ++BN)
+        {
+            add_extra_column(BN);
+        }
+
+        // resolve the problem to get the values of the dual variables
+        resolve_LP();
+
+        flag_unchanged_columns = false;
+        while (!flag_unchanged_columns)
+        {
+            int current_number_of_columns = problem_columns.size();
+            for (int b = 0; b < number_bus; ++b)
+                get_min_reduced_cost_add_the_column_fixed_version(b, t_star); //  t_star is included
+            if (current_number_of_columns != problem_columns.size())
+                resolve_LP();
+            else
+                flag_unchanged_columns = true;
+        }
+
+    }
+
+//    auto end = std::chrono::high_resolution_clock::now();
+//    auto duration = (end - start).count();
+//    std::cout << "Running time: " <<std::setprecision(10)<< duration / 1000000.0 << "ms" << std::endl;
 
     return 0;
 }
