@@ -54,60 +54,110 @@ void initialize_depo_power() // Needs to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-//    total_buses[0] = Bus(0, false, 1, 44, 0, 69.7);
-//    total_buses[1] = Bus(0, true, 3, 47, 0, 67.4);
-//    total_buses[2] = Bus(1, false, 4, 48, 0, 68.9);
-//    total_buses[3] = Bus(1, true, 4, 49, 0, 67.4);
-//    total_buses[4] = Bus(2, false, 9, 50, 0, 66.0);
-//    total_buses[5] = Bus(2, true, 10, 55, 0, 69.1);
-//    total_buses[6] = Bus(3, false, 3, 43, 0, 71.9);
-//    total_buses[7] = Bus(3, true, 2, 44, 0, 66.0);
-//    total_buses[8] = Bus(4, false, 4, 47, 0, 68.9);
-//    total_buses[9] = Bus(4, true, 1, 48, 0, 64.4);
-//    total_buses[10] = Bus(5, false, 4, 50, 0, 64.9);
-//    total_buses[11] = Bus(5, true, 11, 51, 0, 72.9);
-//
-//    total_buses[12] = Bus(6, false, 2, 44, 0, 72.0); //12
-//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[14] = Bus(7, false, 3, 47, 0, 66.0); //13
-//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[16] = Bus(8, false, 2, 48, 0, 64.9); //14
-//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[18] = Bus(9, false, 9, 49, 0, 72.9); //15
-//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[20] = Bus(10, false, 10, 51, 0, 71.5); //16
-//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
-    total_buses[0] = Bus(0, false, 1, 44, 30.3, 69.7);
-    total_buses[1] = Bus(0, true, 3, 47, 32.6, 67.4);
-    total_buses[2] = Bus(1, false, 4, 48, 31.1, 68.9);
-    total_buses[3] = Bus(1, true, 4, 49, 32.6, 67.4);
-    total_buses[4] = Bus(2, false, 9, 50, 34.0, 66.0);
-    total_buses[5] = Bus(2, true, 10, 55, 30.9, 69.1);
-    total_buses[6] = Bus(3, false, 3, 43, 28.1, 71.9);
-    total_buses[7] = Bus(3, true, 2, 44, 34.0, 66.0);
-    total_buses[8] = Bus(4, false, 4, 47, 31.1, 68.9);
-    total_buses[9] = Bus(4, true, 1, 48, 35.6, 64.4);
-    total_buses[10] = Bus(5, false, 4, 50, 35.1, 64.9);
-    total_buses[11] = Bus(5, true, 11, 51, 27.0, 72.9);
+    total_buses[0] = Bus(0, false, 0, number_time_slot - 1, 25, 85);
+    total_buses[1] = Bus(0, true, 0, number_time_slot - 1, 25, 85);
 
-    total_buses[12] = Bus(6, false, 2, 44, 28.0, 72.0); //12
+    total_buses[2] = Bus(1, false, 0, number_time_slot - 1, 25, 85);
+    total_buses[3] = Bus(1, true, 0, number_time_slot - 1, 25, 85);
+
+    total_buses[4] = Bus(2, false, 0, number_time_slot - 1, 25, 85);
+    total_buses[5] = Bus(2, true, 0, number_time_slot - 1, 25, 85);
+
+    total_buses[6] = Bus(3, false, 0, number_time_slot - 1, 25, 85);
+    total_buses[7] = Bus(3, true, 0, number_time_slot - 1, 25, 85);
+
+    total_buses[8] = Bus(4, false, 0, number_time_slot - 1, 25, 85);
+    total_buses[9] = Bus(4, true, 0, number_time_slot - 1, 25, 85);
+
+    total_buses[10] = Bus(5, false, 0, number_time_slot - 1, 25, 85);
+    total_buses[11] = Bus(5, true, 0, number_time_slot - 1, 25, 85);
+
+    total_buses[12] = Bus(6, false, 0, number_time_slot - 1, 25, 85); //12
     total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
 
-    total_buses[14] = Bus(7, false, 3, 47, 34.0, 66.0); //13
+    total_buses[14] = Bus(7, false, 0, number_time_slot - 1, 25, 85); //13
     total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
 
-    total_buses[16] = Bus(8, false, 2, 48, 35.1, 64.9); //14
+    total_buses[16] = Bus(8, false, 0, number_time_slot - 1, 25, 85); //14
     total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
 
-    total_buses[18] = Bus(9, false, 9, 49, 27.1, 72.9); //15
+    total_buses[18] = Bus(9, false, 0, number_time_slot - 1, 25, 85); //15
     total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
 
-    total_buses[20] = Bus(10, false, 10, 51, 28.5, 71.5); //16
+    total_buses[20] = Bus(10, false, 0, number_time_slot - 1, 25, 85); //16
     total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    total_buses[0] = Bus(0, false, 1, 44, 30.3, 69.7);
+//    total_buses[1] = Bus(0, true, 3, 47, 32.6, 67.4);
+//    total_buses[2] = Bus(1, false, 4, 48, 31.1, 68.9);
+//    total_buses[3] = Bus(1, true, 4, 49, 32.6, 67.4);
+//    total_buses[4] = Bus(2, false, 9, 50, 34.0, 66.0);
+//    total_buses[5] = Bus(2, true, 10, 55, 30.9, 69.1);
+//    total_buses[6] = Bus(3, false, 3, 43, 28.1, 71.9);
+//    total_buses[7] = Bus(3, true, 2, 44, 34.0, 66.0);
+//    total_buses[8] = Bus(4, false, 4, 47, 31.1, 68.9);
+//    total_buses[9] = Bus(4, true, 1, 48, 35.6, 64.4);
+//    total_buses[10] = Bus(5, false, 4, 50, 35.1, 64.9);
+//    total_buses[11] = Bus(5, true, 11, 51, 27.0, 72.9);
+//
+//    total_buses[12] = Bus(6, false, 2, 44, 28.0, 72.0); //12
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[14] = Bus(7, false, 3, 47, 34.0, 66.0); //13
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[16] = Bus(8, false, 2, 48, 35.1, 64.9); //14
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[18] = Bus(9, false, 9, 49, 27.1, 72.9); //15
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[20] = Bus(10, false, 10, 51, 28.5, 71.5); //16
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    total_buses[0] = Bus(0, false, 2, 44, 13.19361702, 79.16170213);
+//    total_buses[1] = Bus(0, true, 2, 47, 12.74425532, 76.46553191);
+//    total_buses[2] = Bus(1, false, 1, 48, 12.8712766, 77.22765957);
+//    total_buses[3] = Bus(1, true, 1, 48, 12.57191489, 75.43148936);
+//    total_buses[4] = Bus(2, false, 2, 48, 12.97212766, 77.83276596);
+//    total_buses[5] = Bus(2, true, 3, 49, 12.01787234, 72.10723404);
+//    total_buses[6] = Bus(3, false, 2, 49, 12.57765957, 75.46595745);
+//    total_buses[7] = Bus(3, true, 4, 49, 13.47191489, 80.83148936);
+//    total_buses[8] = Bus(4, false, 2, 50, 12.57191489, 75.43148936);
+//    total_buses[9] = Bus(4, true, 9, 50, 13.19617021, 79.17702128);
+//    total_buses[10] = Bus(5, false, 2, 53, 11.4012766, 68.40765957);
+//    total_buses[11] = Bus(5, true, 10, 55, 13.82170213, 82.93021277);
+//
+//    total_buses[12] = Bus(6, false, 3, 47, 13.20255319, 79.21531915); //12
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[14] = Bus(7, false, 1, 48, 12.6006383, 75.60382979); //13
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[16] = Bus(8, false, 4, 49, 12.74425532, 76.46553191); //14
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[18] = Bus(9, false, 4, 50, 12.97212766, 77.83276596); //15
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//
+//    total_buses[20] = Bus(10, false, 1, 53, 11.67829787, 70.06978723); //16
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    double alpha = 1;
+//    double beta = alpha - 1;
+//    double SoC_bus[number_bus] = {65.96808511, 63.7212766, 66.01276596, 100, 64.35638298, 62.85957447, 63.00319149, 100, 64.8606383, 60.0893617, 63.7212766, 100, 62.88829787, 67.35957447, 64.8606383, 100, 62.85957447, 65.98085106, 58.39148936, 100, 57.00638298, 69.10851064};
+//    int ATS_bus[number_bus] = {2, 2, 3, 0, 1, 1, 1, 0, 2, 3, 4, 0, 2, 4, 4, 0, 2, 9, 1, 0, 2, 10};
+//    int DL_bus[number_bus] = {44, 47, 47,  number_time_slot - 1,48, 48, 48, number_time_slot - 1, 48, 49, 49, number_time_slot - 1, 49, 49, 50, number_time_slot - 1, 50, 50, 53, number_time_slot - 1, 53, 55};
+//    for (int i = 0; i < 6; ++i)
+//    {
+//        total_buses[i*4+0] = Bus(i*2+0, false, ATS_bus[i*4+0], DL_bus[i*4+0], SoC_bus[i*4+0] * beta < 100? SoC_bus[i*4+0] * beta : 100, SoC_bus[i*4+0] * alpha < 100? SoC_bus[i*4+0] * alpha : 100);
+//        total_buses[i*4+1] = Bus(i*2+0, true, ATS_bus[i*4+1], DL_bus[i*4+1], SoC_bus[i*4+1] * beta < 100? SoC_bus[i*4+1] * beta : 100, SoC_bus[i*4+1] * alpha < 100? SoC_bus[i*4+1] * alpha : 100);
+//        if (i != 5)
+//        {
+//            total_buses[i*4+2] = Bus(i*2+1, false, ATS_bus[i*4+2], DL_bus[i*4+2], SoC_bus[i*4+2] * beta < 100? SoC_bus[i*4+2] * beta : 100, SoC_bus[i*4+2] * alpha < 100? SoC_bus[i*4+2] * alpha : 100);
+//            total_buses[i*4+3] = Bus(i*2+1, true, ATS_bus[i*4+3], DL_bus[i*4+3], SoC_bus[i*4+3] * beta < 100? SoC_bus[i*4+3] * beta : 100, SoC_bus[i*4+3] * alpha < 100? SoC_bus[i*4+3] * alpha : 100);
+//        }
+//    }
     memset(fixed_decisions, -1, sizeof(fixed_decisions));
 }
 
@@ -143,10 +193,10 @@ void solve_initial_LP()
     }
     double row_lb[number_bus + 2 * number_charger * number_time_slot + number_time_slot];
     double row_ub[number_bus + 2 * number_charger * number_time_slot + number_time_slot];
-    // 0 ~ (number_bus - 1) are with respect to constraint (1b)
-    // number_bus ~ (number_bus + number_charger * number_time_slot - 1) are with the respect to constraint (1c)
-    // (number_bus + number_charger * number_time_slot) ~ (number_bus + 2 * number_charger * number_time_slot - 1) are with the respect to constraint (1d)
-    // (number_bus + 2 * number_charger * number_time_slot - 1) ~ (number_bus + 2 * number_charger * number_time_slot + number_time_slot - 1) are with the respect to constraint (1e)
+/* 0 ~ (number_bus - 1) are with respect to constraint (1b)
+   number_bus ~ (number_bus + number_charger * number_time_slot - 1) are with the respect to constraint (1c)
+   (number_bus + number_charger * number_time_slot) ~ (number_bus + 2 * number_charger * number_time_slot - 1) are with the respect to constraint (1d)
+   (number_bus + 2 * number_charger * number_time_slot - 1) ~ (number_bus + 2 * number_charger * number_time_slot + number_time_slot - 1) are with the respect to constraint (1e)*/
     for (int i = 0; i < number_bus; ++i)
     {
         row_lb[i] = 1.0;
@@ -582,6 +632,7 @@ void resolve_LP()
         pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
 }
 
+/*
 void use_BCB()
 {
     for (int i = 0; i < problem_columns.size(); ++i)
@@ -593,6 +644,7 @@ void use_BCB()
     ILP_solution = cbcmodel.getCbcColSolution();
     std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
 }
+*/
 
 bool cmp(round_indicator A, round_indicator B)
 {
@@ -638,7 +690,7 @@ int main()
 
 /*************** find the minimal feasible t via bisection: start ***************/
 
-    double ObjValue;
+    double ObjVal;
     int t0 = 0;
     int tT = number_time_slot - 1;
     while (tT - t0 > 1)
@@ -651,7 +703,6 @@ int main()
         model.setLogLevel(0);
 
         int t_star = (t0 + tT) / 2;
-
         initialization();
         solve_initial_LP();
         // First stage: add columns until that can not add
@@ -667,126 +718,136 @@ int main()
                 flag_unchanged_columns = true;
         }
 
-        // Second stage: round (fix)
-        double possibility_of_rates[number_bus][number_time_slot][3];// 3 = {0, 50, 150}
-        std::vector<round_indicator> to_be_fixed_decisions; // to store decisions whose sigma_chi < 0.99
+//        for (int i = 0; i < problem_columns.size(); ++i)
+//            model.setInteger(i);
+//        model.writeLp("/Users/ZwYu/Desktop/ILP");
 
-        int max_rounding_times = 1000;
-        while (max_rounding_times--)
+        ObjVal = model.getObjValue();
+        if (ObjVal == 0)
         {
-            memset(possibility_of_rates, 0, sizeof(possibility_of_rates));
-            to_be_fixed_decisions.clear();
-            for (int i = 0; i < problem_columns.size(); ++i) // calculate the indicators
+            std::cout<<"Because when t* is "<<t_star<<", LP ObjVal is " << ObjVal<<", be rounded!"<<std::endl;
+
+            // Second stage: round (fix)
+            double possibility_of_rates[number_bus][number_time_slot][3];// 3 = {0, 50, 150}
+            std::vector<round_indicator> to_be_fixed_decisions; // to store decisions whose sigma_chi < 0.99
+
+            int max_rounding_times = 1000;
+            while (max_rounding_times--)
             {
-                int BN = problem_columns[i].BN;
-                int ColN = problem_columns[i].ColN;
-                for (int t = 0; t < number_time_slot; ++t)
+                memset(possibility_of_rates, 0, sizeof(possibility_of_rates));
+                to_be_fixed_decisions.clear();
+                for (int i = 0; i < problem_columns.size(); ++i) // calculate the indicators
                 {
-                    if (bus_columns[BN][ColN].PR[t] == 0)
-                        possibility_of_rates[BN][t][0] += chi[i];
-                    if (bus_columns[BN][ColN].PR[t] == 50)
-                        possibility_of_rates[BN][t][1] += chi[i];
-                    if (bus_columns[BN][ColN].PR[t] == 150)
-                        possibility_of_rates[BN][t][2] += chi[i];
-                }
-            }
-            // fix the decisions that are one
-            for (int BN = 0; BN < number_bus; ++BN)
-                for (int t = 0; t < number_time_slot; ++t)
-                    for (int rate = 0; rate < 3; ++rate) // 0:0, 1:50, 2:150.
+                    int BN = problem_columns[i].BN;
+                    int ColN = problem_columns[i].ColN;
+                    for (int t = 0; t < number_time_slot; ++t)
                     {
-                        double possibility = possibility_of_rates[BN][t][rate];
-                        if (0.99 <= possibility && fixed_decisions[BN][t] == -1)
-                            fixed_decisions[BN][t] = rate; // 0, 1, 2 = 0, 50, 150 needs to be unified later..
-                        else if (possibility > 0 && fixed_decisions[BN][t] == -1)
-                            to_be_fixed_decisions.push_back(round_indicator(BN, t, rate, possibility));
-                    }
-            // find the most possible variable to fix
-            std::sort(to_be_fixed_decisions.begin(), to_be_fixed_decisions.end(), cmp);
-            if (to_be_fixed_decisions.size() > 1) // fix process
-            {
-                for (int i = 0; i < to_be_fixed_decisions.size(); ++i)
-                {
-                    int BN = to_be_fixed_decisions[i].BN;
-                    int t = to_be_fixed_decisions[i].t;
-                    int rate = to_be_fixed_decisions[i].rate;
-                    if (if_satisfy_constraints(BN, t, rate))
-                    {
-                        fixed_decisions[BN][t] = rate; // 0, 1, 2 (not 0, 50, 150) needs to be unified later...
-                        break;
+                        if (bus_columns[BN][ColN].PR[t] == 0)
+                            possibility_of_rates[BN][t][0] += chi[i];
+                        if (bus_columns[BN][ColN].PR[t] == 50)
+                            possibility_of_rates[BN][t][1] += chi[i];
+                        if (bus_columns[BN][ColN].PR[t] == 150)
+                            possibility_of_rates[BN][t][2] += chi[i];
                     }
                 }
-            }
-            else
-            {
-                std::cout<<"When t* = "<<t_star<<", ObjValue is "<< model.getObjValue()<<std::endl; // in case...
-                break;
-            }
-            // delete the violating columns
-            for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();) // here all-zero columns always exist
-            {
-                int BN = it->BN;
-                int ColN = it->ColN;
-                for (int t = 0; t < number_time_slot; ++t)
+                // fix the decisions that are one
+                for (int BN = 0; BN < number_bus; ++BN)
+                    for (int t = 0; t < number_time_slot; ++t)
+                        for (int rate = 0; rate < 3; ++rate) // 0:0, 1:50, 2:150.
+                        {
+                            double possibility = possibility_of_rates[BN][t][rate];
+                            if (0.99 <= possibility && fixed_decisions[BN][t] == -1)
+                                fixed_decisions[BN][t] = rate; // 0, 1, 2 = 0, 50, 150 needs to be unified later..
+                            else if (possibility > 0 && fixed_decisions[BN][t] == -1)
+                                to_be_fixed_decisions.push_back(round_indicator(BN, t, rate, possibility));
+                        }
+                // find the most possible variable to fix
+                std::sort(to_be_fixed_decisions.begin(), to_be_fixed_decisions.end(), cmp);
+                if (to_be_fixed_decisions.size() > 1) // fix process
                 {
-                    if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
+                    for (int i = 0; i < to_be_fixed_decisions.size(); ++i)
                     {
-                        int index = std::distance(problem_columns.begin(), it);
-                        int col[1];
-                        col[0] = index;
-                        model.deleteCols(1, col);
-                        it = problem_columns.erase(it);
-                        it--;
-                        break;
-                    }
-                    if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
-                    {
-                        int index = std::distance(problem_columns.begin(), it);
-                        int col[1];
-                        col[0] = index;
-                        model.deleteCols(1, col);
-                        it = problem_columns.erase(it);
-                        it--;
-                        break;
-                    }
-                    if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
-                    {
-                        int index = std::distance(problem_columns.begin(), it);
-                        int col[1];
-                        col[0] = index;
-                        model.deleteCols(1, col);
-                        it = problem_columns.erase(it);
-                        it--;
-                        break;
+                        int BN = to_be_fixed_decisions[i].BN;
+                        int t = to_be_fixed_decisions[i].t;
+                        int rate = to_be_fixed_decisions[i].rate;
+                        if (if_satisfy_constraints(BN, t, rate))
+                        {
+                            fixed_decisions[BN][t] = rate; // 0, 1, 2 (not 0, 50, 150) needs to be unified later...
+                            break;
+                        }
                     }
                 }
-                it++;
-            }
-
-            for (int BN = 0; BN < number_bus; ++BN)
-            {
-                add_extra_column(BN);
-            }
-
-            // resolve the problem to get the values of the dual variables
-            resolve_LP();
-
-            flag_unchanged_columns = false;
-            while (!flag_unchanged_columns)
-            {
-                int current_number_of_columns = problem_columns.size();
-                for (int b = 0; b < number_bus; ++b)
-                    get_min_reduced_cost_add_the_column_fixed_version(b, t_star); //  t_star is included
-                if (current_number_of_columns != problem_columns.size())
-                    resolve_LP();
                 else
-                    flag_unchanged_columns = true;
+                {
+                    std::cout<<"When t* is "<<t_star<<", ObjValue obtained by RCGA is "<< model.getObjValue()<<std::endl; // in case...
+                    break;
+                }
+                // delete the violating columns
+                for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();) // here all-zero columns always exist
+                {
+                    int BN = it->BN;
+                    int ColN = it->ColN;
+                    for (int t = 0; t < number_time_slot; ++t)
+                    {
+                        if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
+                        {
+                            int index = std::distance(problem_columns.begin(), it);
+                            int col[1];
+                            col[0] = index;
+                            model.deleteCols(1, col);
+                            it = problem_columns.erase(it);
+                            it--;
+                            break;
+                        }
+                        if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
+                        {
+                            int index = std::distance(problem_columns.begin(), it);
+                            int col[1];
+                            col[0] = index;
+                            model.deleteCols(1, col);
+                            it = problem_columns.erase(it);
+                            it--;
+                            break;
+                        }
+                        if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
+                        {
+                            int index = std::distance(problem_columns.begin(), it);
+                            int col[1];
+                            col[0] = index;
+                            model.deleteCols(1, col);
+                            it = problem_columns.erase(it);
+                            it--;
+                            break;
+                        }
+                    }
+                    it++;
+                }
+
+                for (int BN = 0; BN < number_bus; ++BN)
+                {
+                    add_extra_column(BN);
+                }
+
+                // resolve the problem to get the values of the dual variables
+                resolve_LP();
+
+                flag_unchanged_columns = false;
+                while (!flag_unchanged_columns)
+                {
+                    int current_number_of_columns = problem_columns.size();
+                    for (int b = 0; b < number_bus; ++b)
+                        get_min_reduced_cost_add_the_column_fixed_version(b, t_star); //  t_star is included
+                    if (current_number_of_columns != problem_columns.size())
+                        resolve_LP();
+                    else
+                        flag_unchanged_columns = true;
+                }
             }
-
         }
+        else
+            std::cout<<"Because when t* is "<<t_star<<", LP ObjVal is " << ObjVal<<", need not to be rounded!"<<std::endl;
 
-        ObjValue = model.getObjValue();
-        if (ObjValue > 0)
+        if (model.getObjValue() > 0)
             t0 = t_star;
         else
             tT = t_star;
@@ -795,7 +856,6 @@ int main()
 /*************** find the minimal feasible t via bisection: end ***************/
 
 /*************** resolve for minimal feasible t: start ***************/
-
     model.reset();
     for (int i = 0; i < number_bus; ++i)
         bus_columns[i].clear();
@@ -809,8 +869,7 @@ int main()
     solve_initial_LP();
     // First stage: add columns until that can not add
     bool flag_unchanged_columns = false;
-    while (!flag_unchanged_columns)
-    {
+    while (!flag_unchanged_columns) {
         int current_number_of_columns = problem_columns.size();
         for (int b = 0; b < number_bus; ++b)
             get_min_reduced_cost_add_the_column(b, t_star); //  t_star is included
@@ -825,16 +884,14 @@ int main()
     std::vector<round_indicator> to_be_fixed_decisions; // to store decisions whose sigma_chi < 0.99
 
     int max_rounding_times = 1000;
-    while (max_rounding_times--)
-    {
+    while (max_rounding_times--) {
         memset(possibility_of_rates, 0, sizeof(possibility_of_rates));
         to_be_fixed_decisions.clear();
         for (int i = 0; i < problem_columns.size(); ++i) // calculate the indicators
         {
             int BN = problem_columns[i].BN;
             int ColN = problem_columns[i].ColN;
-            for (int t = 0; t < number_time_slot; ++t)
-            {
+            for (int t = 0; t < number_time_slot; ++t) {
                 if (bus_columns[BN][ColN].PR[t] == 0)
                     possibility_of_rates[BN][t][0] += chi[i];
                 if (bus_columns[BN][ColN].PR[t] == 50)
@@ -872,18 +929,17 @@ int main()
         }
         else
         {
-            std::cout<<"When t* = "<<t_star<<", ObjValue is "<< model.getObjValue()<<std::endl; // in case...
+            std::cout<<"Found the minimal feasible t* is "<<t_star<<", the ObjValue obtained by RCGA is "<< model.getObjValue()<<std::endl; // in case...
             break;
         }
         // delete the violating columns
-        for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();) // here all-zero columns always exist
+        for (std::vector<column_information>::iterator it = problem_columns.begin();
+             it != problem_columns.end();) // here all-zero columns always exist
         {
             int BN = it->BN;
             int ColN = it->ColN;
-            for (int t = 0; t < number_time_slot; ++t)
-            {
-                if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
-                {
+            for (int t = 0; t < number_time_slot; ++t) {
+                if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] != 0) {
                     int index = std::distance(problem_columns.begin(), it);
                     int col[1];
                     col[0] = index;
@@ -892,8 +948,7 @@ int main()
                     it--;
                     break;
                 }
-                if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
-                {
+                if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] != 50) {
                     int index = std::distance(problem_columns.begin(), it);
                     int col[1];
                     col[0] = index;
@@ -902,8 +957,7 @@ int main()
                     it--;
                     break;
                 }
-                if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
-                {
+                if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] != 150) {
                     int index = std::distance(problem_columns.begin(), it);
                     int col[1];
                     col[0] = index;
@@ -916,8 +970,7 @@ int main()
             it++;
         }
 
-        for (int BN = 0; BN < number_bus; ++BN)
-        {
+        for (int BN = 0; BN < number_bus; ++BN) {
             add_extra_column(BN);
         }
 
@@ -925,8 +978,7 @@ int main()
         resolve_LP();
 
         flag_unchanged_columns = false;
-        while (!flag_unchanged_columns)
-        {
+        while (!flag_unchanged_columns) {
             int current_number_of_columns = problem_columns.size();
             for (int b = 0; b < number_bus; ++b)
                 get_min_reduced_cost_add_the_column_fixed_version(b, t_star); //  t_star is included
@@ -940,20 +992,13 @@ int main()
 
 // To store the solution: start //
     std::vector<column_information> solution_columns;
-    int ccc = 0;
     for (int i = 0; i < problem_columns.size(); ++i)
-    {
         if (chi[i] == 1)
-        {
             solution_columns.push_back(problem_columns[i]);
-            ccc++;
-        }
-    }
     std::sort(solution_columns.begin(), solution_columns.end(), cmp_solution);
     for (int i = 0; i < solution_columns.size(); ++i)
-        std::cout<<"BN: "<<solution_columns[i].BN<<", ColN: "<<solution_columns[i].ColN<<std::endl;
+        std::cout << "BN: " << solution_columns[i].BN << ", ColN: " << solution_columns[i].ColN << std::endl;
 // To store the solution: end //
-
 /*************** resolve for minimal feasible t: end ***************/
 
     auto end = std::chrono::high_resolution_clock::now();
