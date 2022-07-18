@@ -13,6 +13,8 @@
 #include "Bus.h"
 #include "SPFA.h"
 
+int how_many = 0;
+
 Bus total_buses[number_bus]; // List of busus; pre-input information
 int chargers[number_charger][2]; // List of charger; pre-input information
 
@@ -368,23 +370,23 @@ void get_min_reduced_cost_add_the_column_fixed_version(int BN, int t_star) // BN
     graph.SetSourceAndTank(0, n * m + 1);
     if (!total_buses[BN].prime) // b
     {
-        if (fixed_decisions[BN][0] == -1)
+        if (fixed_decisions[BN][0+total_buses[BN].ATS] == -1)
         {
             graph.InputAdjMat(0, 1, 0);
             graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
             graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
         }
-        else if (fixed_decisions[BN][0] == 0)
+        else if (fixed_decisions[BN][0+total_buses[BN].ATS] == 0)
             graph.InputAdjMat(0, 1, 0);
-        else if (fixed_decisions[BN][0] == 1)
+        else if (fixed_decisions[BN][0+total_buses[BN].ATS] == 1)
             graph.InputAdjMat(0, 2, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
-        else if (fixed_decisions[BN][0] == 2)
+        else if (fixed_decisions[BN][0+total_buses[BN].ATS] == 2)
             graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
 
         for (int t = 1; t < m; ++t) // if m = 1, then skip this process
             for (int node = 1; node < n + 1; ++node)
             {
-                if (fixed_decisions[BN][0] == -1)
+                if (fixed_decisions[BN][t+total_buses[BN].ATS] == -1)
                 {
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
                     if (node < n)
@@ -392,14 +394,14 @@ void get_min_reduced_cost_add_the_column_fixed_version(int BN, int t_star) // BN
                     if (node < n - 2)
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
                 }
-                else if (fixed_decisions[BN][0] == 0)
+                else if (fixed_decisions[BN][t+total_buses[BN].ATS] == 0)
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
-                else if (fixed_decisions[BN][0] == 1)
+                else if (fixed_decisions[BN][t+total_buses[BN].ATS] == 1)
                 {
                     if (node < n)
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
                 }
-                else if (fixed_decisions[BN][0] == 2)
+                else if (fixed_decisions[BN][t+total_buses[BN].ATS] == 2)
                 {
                     if (node < n - 2)
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
@@ -411,23 +413,23 @@ void get_min_reduced_cost_add_the_column_fixed_version(int BN, int t_star) // BN
     }
     else // b'
     {
-        if (fixed_decisions[BN][0] == -1)
+        if (fixed_decisions[BN][0+total_buses[BN].ATS] == -1)
         {
             graph.InputAdjMat(0, 1, 0);
             graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
             graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
         }
-        else if (fixed_decisions[BN][0] == 0)
+        else if (fixed_decisions[BN][0+total_buses[BN].ATS] == 0)
             graph.InputAdjMat(0, 1, 0);
-        else if (fixed_decisions[BN][0] == 1)
+        else if (fixed_decisions[BN][0+total_buses[BN].ATS] == 1)
             graph.InputAdjMat(0, 2, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1e[total_buses[BN].ATS]);
-        else if (fixed_decisions[BN][0] == 2)
+        else if (fixed_decisions[BN][0+total_buses[BN].ATS] == 2)
             graph.InputAdjMat(0, 4, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS] - 3 * pi_1e[total_buses[BN].ATS]);
 
         for (int t = 1; t < m; ++t)
             for (int node = 1; node < n + 1; ++node)
             {
-                if (fixed_decisions[BN][0] == -1)
+                if (fixed_decisions[BN][t+total_buses[BN].ATS] == -1)
                 {
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
                     if (node < n)
@@ -435,14 +437,14 @@ void get_min_reduced_cost_add_the_column_fixed_version(int BN, int t_star) // BN
                     if (node < n - 2)
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
                 }
-                else if (fixed_decisions[BN][0] == 0)
+                else if (fixed_decisions[BN][t+total_buses[BN].ATS] == 0)
                     graph.InputAdjMat(node + (t - 1) * n, node + t * n, 0);
-                else if (fixed_decisions[BN][0] == 1)
+                else if (fixed_decisions[BN][t+total_buses[BN].ATS] == 1)
                 {
                     if (node < n)
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 1, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1e[total_buses[BN].ATS + t]);
                 }
-                else if (fixed_decisions[BN][0] == 2)
+                else if (fixed_decisions[BN][t+total_buses[BN].ATS] == 2)
                 {
                     if (node < n - 2)
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - pi_1d[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
@@ -582,17 +584,17 @@ void resolve_LP()
         pi_1e[i] = *(dualvariables + number_bus + 2 * number_charger * number_time_slot + i);
 }
 
-void use_BCB()
-{
-    for (int i = 0; i < problem_columns.size(); ++i)
-        model.setInteger(i);
-    CbcModel cbcmodel(model);
-//    cbcmodel.setLogLevel(0); // Don't print the log
-    cbcmodel.branchAndBound();
-    const double* ILP_solution;
-    ILP_solution = cbcmodel.getCbcColSolution();
-    std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
-}
+//void use_BCB()
+//{
+//    for (int i = 0; i < problem_columns.size(); ++i)
+//        model.setInteger(i);
+//    CbcModel cbcmodel(model);
+////    cbcmodel.setLogLevel(0); // Don't print the log
+//    cbcmodel.branchAndBound();
+//    const double* ILP_solution;
+//    ILP_solution = cbcmodel.getCbcColSolution();
+//    std::cout<<cbcmodel.getBestPossibleObjValue()<<std::endl;
+//}
 
 bool cmp(round_indicator A, round_indicator B)
 {
@@ -620,16 +622,76 @@ bool if_satisfy_constraints(int BN, int t, int rate)
         if (fixed_decisions[other_BN][t] == 1 || fixed_decisions[other_BN][t] == 2)
             return false;
     int fixed_total_power = 0;
-    for (int other_BN = 0; other_BN < number_bus && other_BN != BN; ++other_BN)
+    for (int other_BN = 0; other_BN < number_bus; ++other_BN)
     {
-        if (fixed_decisions[other_BN][t] == 1)
-            fixed_total_power += 50;
-        if (fixed_decisions[other_BN][t] == 2)
-            fixed_total_power += 150;
+        if (other_BN != BN)
+        {
+            if (fixed_decisions[other_BN][t] == 1)
+                fixed_total_power += 50;
+            if (fixed_decisions[other_BN][t] == 2)
+                fixed_total_power += 150;
+        }
     }
+    if (rate == 1)
+        rate = 50;
+    if (rate == 2)
+        rate = 150;
     if (fixed_total_power + rate > depo_power[t] - base_load_power)
         return false;
     return true;
+}
+
+void how_many_unfixed()
+{
+    int counter = 0;
+    for (int i = 0; i < number_bus; ++i)
+        for (int j = 0; j < number_time_slot; ++j)
+            if (fixed_decisions[i][j] != -1)
+                counter++;
+    how_many = counter;
+}
+
+void remove_violating_columns()
+{
+    for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();) // here all-zero columns always exist
+    {
+        int BN = it->BN;
+        int ColN = it->ColN;
+        for (int t = 0; t < number_time_slot; ++t)
+        {
+            if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
+            {
+                int index = std::distance(problem_columns.begin(), it);
+                int col[1];
+                col[0] = index;
+                model.deleteCols(1, col);
+                it = problem_columns.erase(it);
+                it--;
+                break;
+            }
+            if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
+            {
+                int index = std::distance(problem_columns.begin(), it);
+                int col[1];
+                col[0] = index;
+                model.deleteCols(1, col);
+                it = problem_columns.erase(it);
+                it--;
+                break;
+            }
+            if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
+            {
+                int index = std::distance(problem_columns.begin(), it);
+                int col[1];
+                col[0] = index;
+                model.deleteCols(1, col);
+                it = problem_columns.erase(it);
+                it--;
+                break;
+            }
+        }
+        it++;
+    }
 }
 
 int main()
@@ -641,16 +703,18 @@ int main()
     double ObjValue;
     int t0 = 0;
     int tT = number_time_slot - 1;
-    while (tT - t0 > 1)
+    int t_star = 51;
+//    while (tT - t0 > 1)
+    while (tT - t_star > 1)
     {
         model.reset();
         for (int i = 0; i < number_bus; ++i)
             bus_columns[i].clear();
         problem_columns.clear();
 
-        model.setLogLevel(0);
+//        model.setLogLevel(0);
 
-        int t_star = (t0 + tT) / 2;
+//        int t_star = (t0 + tT) / 2;
 
         initialization();
         solve_initial_LP();
@@ -667,12 +731,18 @@ int main()
                 flag_unchanged_columns = true;
         }
 
+        for (int i = 0; i < problem_columns.size(); ++i)
+            model.setInteger(i);
+        model.writeLp("/Users/ZwYu/Desktop/ILP");
+
+        std::cout<<"When t* = "<<t_star<<", LP's ObjValue is "<<model.getObjValue()<<std::endl;
+
         // Second stage: round (fix)
         double possibility_of_rates[number_bus][number_time_slot][3];// 3 = {0, 50, 150}
         std::vector<round_indicator> to_be_fixed_decisions; // to store decisions whose sigma_chi < 0.99
 
-        int max_rounding_times = 1000;
-        while (max_rounding_times--)
+        int rounding_times = 0;
+        while (rounding_times++ < 1000)
         {
             memset(possibility_of_rates, 0, sizeof(possibility_of_rates));
             to_be_fixed_decisions.clear();
@@ -719,54 +789,19 @@ int main()
             }
             else
             {
-                std::cout<<"When t* = "<<t_star<<", ObjValue is "<< model.getObjValue()<<std::endl; // in case...
+                remove_violating_columns();
+                resolve_LP();
+                std::cout<<"When t* = "<<t_star<<", RCGA gets ObjValue that is "<< model.getObjValue()<<std::endl; // in case...
                 break;
             }
-            // delete the violating columns
-            for (std::vector<column_information>::iterator it = problem_columns.begin(); it != problem_columns.end();) // here all-zero columns always exist
-            {
-                int BN = it->BN;
-                int ColN = it->ColN;
-                for (int t = 0; t < number_time_slot; ++t)
-                {
-                    if (fixed_decisions[BN][t] == 0 && bus_columns[BN][ColN].PR[t] !=0)
-                    {
-                        int index = std::distance(problem_columns.begin(), it);
-                        int col[1];
-                        col[0] = index;
-                        model.deleteCols(1, col);
-                        it = problem_columns.erase(it);
-                        it--;
-                        break;
-                    }
-                    if (fixed_decisions[BN][t] == 1 && bus_columns[BN][ColN].PR[t] !=50)
-                    {
-                        int index = std::distance(problem_columns.begin(), it);
-                        int col[1];
-                        col[0] = index;
-                        model.deleteCols(1, col);
-                        it = problem_columns.erase(it);
-                        it--;
-                        break;
-                    }
-                    if (fixed_decisions[BN][t] == 2 && bus_columns[BN][ColN].PR[t] !=150)
-                    {
-                        int index = std::distance(problem_columns.begin(), it);
-                        int col[1];
-                        col[0] = index;
-                        model.deleteCols(1, col);
-                        it = problem_columns.erase(it);
-                        it--;
-                        break;
-                    }
-                }
-                it++;
-            }
+            how_many_unfixed();
 
+            // delete the violating columns
+            remove_violating_columns();
+
+            // add reparative columns to make the model feasible
             for (int BN = 0; BN < number_bus; ++BN)
-            {
                 add_extra_column(BN);
-            }
 
             // resolve the problem to get the values of the dual variables
             resolve_LP();
@@ -782,19 +817,36 @@ int main()
                 else
                     flag_unchanged_columns = true;
             }
-
         }
 
-        ObjValue = model.getObjValue();
-        if (ObjValue > 0)
-            t0 = t_star;
-        else
-            tT = t_star;
+//        // To store the solution: start //
+//        std::vector<column_information> solution_columns;
+//        int ccc = 0;
+//        for (int i = 0; i < problem_columns.size(); ++i)
+//        {
+//            if (abs(chi[i] - 1) < 1e-6)
+//            {
+//                solution_columns.push_back(problem_columns[i]);
+//                ccc++;
+//            }
+//        }
+//        std::sort(solution_columns.begin(), solution_columns.end(), cmp_solution);
+//        for (int i = 0; i < solution_columns.size(); ++i)
+//            std::cout<<"BN: "<<solution_columns[i].BN<<", ColN: "<<solution_columns[i].ColN<<std::endl;
+//        // To store the solution: end //
+
+//        ObjValue = model.getObjValue();
+//        if (ObjValue > 0)
+//            t0 = t_star;
+//        else
+//            tT = t_star;
+        t_star++;
     }
 
 /*************** find the minimal feasible t via bisection: end ***************/
 
-/*************** resolve for minimal feasible t: start ***************/
+/*
+//=============== resolve for minimal feasible t: start ===============//
 
     model.reset();
     for (int i = 0; i < number_bus; ++i)
@@ -872,7 +924,7 @@ int main()
         }
         else
         {
-            std::cout<<"When t* = "<<t_star<<", ObjValue is "<< model.getObjValue()<<std::endl; // in case...
+            std::cout<<"\n\nThe minimal t* = "<<t_star<<", RCGA gets ObjValue that is "<< model.getObjValue()<<std::endl; // in case...
             break;
         }
         // delete the violating columns
@@ -954,8 +1006,8 @@ int main()
         std::cout<<"BN: "<<solution_columns[i].BN<<", ColN: "<<solution_columns[i].ColN<<std::endl;
 // To store the solution: end //
 
-/*************** resolve for minimal feasible t: end ***************/
-
+//=============== resolve for minimal feasible t: end ===============//
+*/
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = (end - start).count();
     std::cout << "Running time: " <<std::setprecision(10)<< duration / 1000000.0 << "ms" << std::endl;
