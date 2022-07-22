@@ -7,8 +7,8 @@
 
 #define number_bus 22 // 6 * 2 + 5 + (dummy: 5)
 #define number_charger number_bus/2
-//#define number_time_slot 56 // 18:00 ~ 8:00 = 14 hours; 56 = 14h / 15min
-#define number_time_slot 60 // 18:00 ~ 8:00 = 14 hours; 56 = 14h / 15min
+#define number_time_slot 56 // 18:00 ~ 8:00 = 14 hours; 56 = 14h / 15min
+//#define number_time_slot 60 // 18:00 ~ 8:00 = 14 hours; 56 = 14h / 15min
 #define base_load_power 500 // base load power is 500kW
 #define energy_percent_every_time_slot_1 2.2 // 50kW * 15min / 60min / 564KWh = 2.2% (15min/ts), or 4.4% (30min/ts)
 #define energy_percent_every_time_slot_2 1.75 // 50kW * 80% * 15min / 60min / 564KWh = 1.75% (15min/ts), or 3.5% (30min/ts)

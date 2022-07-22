@@ -31,6 +31,7 @@ public:
 
     rate_sequence();
     rate_sequence(double ISoC, double RSoC); // All zero power rates constructor
+    static bool isequal(rate_sequence A, rate_sequence B);
 };
 
 class column_information

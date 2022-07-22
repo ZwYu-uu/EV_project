@@ -29,6 +29,14 @@ rate_sequence::rate_sequence(double ISoC, double RSoC)
     this->delta = RSoC - this->SoC[number_time_slot] > 0 ? RSoC - this->SoC[number_time_slot] : 0;
 }
 
+bool rate_sequence::isequal(rate_sequence A, rate_sequence B)
+{
+    for (int i = 0; i < number_time_slot; ++i)
+        if (A.PR[i] != B.PR[i])
+            return false;
+    return true;
+}
+
 column_information::column_information() {}
 
 column_information::column_information(int BN, int ColN, double delta)
