@@ -13,7 +13,7 @@
 #include "Bus.h"
 #include "SPFA.h"
 
-int how_many = 0;
+int how_many_fixed = 0;
 
 Bus total_buses[number_bus]; // List of busus; pre-input information
 int chargers[number_charger][2]; // List of charger; pre-input information
@@ -56,63 +56,749 @@ void initialize_depo_power() // Needs to rewrite
 
 void initialize_total_buses() // Need to rewrite via reading file to initialize
 {
-//    total_buses[0] = Bus(0, false, 1, 44, 30.3, 69.7);
-//    total_buses[1] = Bus(0, true, 3, 47, 32.6, 67.4);
-//    total_buses[2] = Bus(1, false, 4, 48, 31.1, 68.9);
-//    total_buses[3] = Bus(1, true, 4, 49, 32.6, 67.4);
-//    total_buses[4] = Bus(2, false, 9, 50, 34.0, 66.0);
-//    total_buses[5] = Bus(2, true, 10, 55, 30.9, 69.1);
-//    total_buses[6] = Bus(3, false, 3, 43, 28.1, 71.9);
-//    total_buses[7] = Bus(3, true, 2, 44, 34.0, 66.0);
-//    total_buses[8] = Bus(4, false, 4, 47, 31.1, 68.9);
-//    total_buses[9] = Bus(4, true, 1, 48, 35.6, 64.4);
-//    total_buses[10] = Bus(5, false, 4, 50, 35.1, 64.9);
-//    total_buses[11] = Bus(5, true, 11, 51, 27.0, 72.9);
-//
-//    total_buses[12] = Bus(6, false, 2, 44, 28.0, 72.0); //12
+
+//    total_buses[0] = Bus(0, false, 11, 41, 15.273191489361704, 91.6391489361702);
+//    total_buses[1] = Bus(0, true, 3, 41, 14.37893617021277, 86.2736170212766);
+
+//    // This average is 229 km. No solution
+//    total_buses[0] = Bus(0, false, 11, 41, 15.273191489361704, 91.6391489361702);
+//    total_buses[1] = Bus(0, true, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[12] = Bus(6, false, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[2] = Bus(1, false, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[3] = Bus(1, true, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[14] = Bus(7, false, 9, 45, 15.480000000000002, 92.88);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 12, 46, 15.65617021276596, 93.93702127659574);
+//    total_buses[16] = Bus(8, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[6] = Bus(3, false, 12, 47, 15.003829787234043, 90.02297872340425);
+//    total_buses[7] = Bus(3, true, 10, 47, 15.333191489361703, 91.9991489361702);
+//    total_buses[18] = Bus(9, false, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[8] = Bus(4, false, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[9] = Bus(4, true, 11, 48, 15.005106382978726, 90.03063829787233);
+//    total_buses[20] = Bus(10, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
 //    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[14] = Bus(7, false, 3, 47, 34.0, 66.0); //13
 //    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[16] = Bus(8, false, 2, 48, 35.1, 64.9); //14
 //    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[18] = Bus(9, false, 9, 49, 27.1, 72.9); //15
 //    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
-//
-//    total_buses[20] = Bus(10, false, 10, 51, 28.5, 71.5); //16
 //    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
 
-    // This data is from "omlopp 2.xlsx". The average distance is 199.6 km.
-    total_buses[0] = Bus(0, false, 2, 44, 13.19361702, 79.16170213);
-    total_buses[1] = Bus(0, true, 2, 47, 12.74425532, 76.46553191);
-    total_buses[2] = Bus(1, false, 1, 48, 12.8712766, 77.22765957);
-    total_buses[3] = Bus(1, true, 1, 48, 12.57191489, 75.43148936);
-    total_buses[4] = Bus(2, false, 2, 48, 12.97212766, 77.83276596);
-    total_buses[5] = Bus(2, true, 3, 49, 12.01787234, 72.10723404);
-    total_buses[6] = Bus(3, false, 2, 49, 12.57765957, 75.46595745);
-    total_buses[7] = Bus(3, true, 4, 49, 13.47191489, 80.83148936);
-    total_buses[8] = Bus(4, false, 2, 50, 12.57191489, 75.43148936);
-    total_buses[9] = Bus(4, true, 9, 50, 13.19617021, 79.17702128);
-    total_buses[10] = Bus(5, false, 2, 53, 11.4012766, 68.40765957);
-    total_buses[11] = Bus(5, true, 10, 55, 13.82170213, 82.93021277);
+//    // The average distance is 224 km. 52
+//    total_buses[0] = Bus(0, false, 11, 41, 15.273191489361704, 91.6391489361702);
+//    total_buses[1] = Bus(0, true, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[12] = Bus(6, false, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[2] = Bus(1, false, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[3] = Bus(1, true, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[14] = Bus(7, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[4] = Bus(2, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[5] = Bus(2, true, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[16] = Bus(8, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[6] = Bus(3, false, 12, 47, 15.003829787234043, 90.02297872340425);
+//    total_buses[7] = Bus(3, true, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[18] = Bus(9, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[8] = Bus(4, false, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[9] = Bus(4, true, 11, 48, 15.005106382978726, 90.03063829787233);
+//    total_buses[20] = Bus(10, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
 
-    total_buses[12] = Bus(6, false, 3, 47, 13.20255319, 79.21531915); //12
+//    // This average is 222km.
+//    total_buses[0] = Bus(0, false, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[1] = Bus(0, true, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[12] = Bus(6, false, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[2] = Bus(1, false, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[14] = Bus(7, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[4] = Bus(2, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[5] = Bus(2, true, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[16] = Bus(8, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[6] = Bus(3, false, 12, 47, 15.003829787234043, 90.02297872340425);
+//    total_buses[7] = Bus(3, true, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[18] = Bus(9, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[8] = Bus(4, false, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[9] = Bus(4, true, 11, 48, 15.005106382978726, 90.03063829787233);
+//    total_buses[20] = Bus(10, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 220 km. 51
+//    total_buses[0] = Bus(0, false, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[1] = Bus(0, true, 10, 41, 16.314893617021276, 97.88936170212766);
+//    total_buses[12] = Bus(6, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[2] = Bus(1, false, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[3] = Bus(1, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[14] = Bus(7, false, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[4] = Bus(2, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[5] = Bus(2, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[16] = Bus(8, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[6] = Bus(3, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[7] = Bus(3, true, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[18] = Bus(9, false, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[8] = Bus(4, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[9] = Bus(4, true, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 219 km. no solution
+//    total_buses[0] = Bus(0, false, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[1] = Bus(0, true, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[12] = Bus(6, false, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[2] = Bus(1, false, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[14] = Bus(7, false, 9, 45, 15.480000000000002, 92.88);
+//    total_buses[4] = Bus(2, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[5] = Bus(2, true, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[16] = Bus(8, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[6] = Bus(3, false, 12, 46, 15.65617021276596, 93.93702127659574);
+//    total_buses[7] = Bus(3, true, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[18] = Bus(9, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[8] = Bus(4, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[9] = Bus(4, true, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+    // 218.34 km. 46
+    total_buses[0] = Bus(0, false, 11, 41, 15.273191489361704, 91.6391489361702);
+    total_buses[1] = Bus(0, true, 3, 41, 14.37893617021277, 86.2736170212766);
+    total_buses[12] = Bus(6, false, 2, 42, 13.193617021276596, 79.16170212765957);
+    total_buses[2] = Bus(1, false, 1, 42, 13.930212765957448, 83.5812765957447);
+    total_buses[3] = Bus(1, true, 2, 42, 14.391702127659576, 86.35021276595744);
+    total_buses[14] = Bus(7, false, 3, 45, 13.202553191489361, 79.21531914893617);
+    total_buses[4] = Bus(2, false, 3, 45, 13.47191489361702, 80.83148936170213);
+    total_buses[5] = Bus(2, true, 4, 45, 13.777021276595743, 82.66212765957447);
+    total_buses[16] = Bus(8, false, 4, 46, 13.788510638297874, 82.73106382978723);
+    total_buses[6] = Bus(3, false, 11, 46, 14.37191489361702, 86.23148936170213);
+    total_buses[7] = Bus(3, true, 4, 47, 13.47191489361702, 80.83148936170213);
+    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+    total_buses[8] = Bus(4, false, 13, 48, 14.37191489361702, 86.23148936170213);
+    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+    total_buses[20] = Bus(10, false, 11, 48, 15.005106382978726, 90.03063829787233);
+    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
     total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
-
-    total_buses[14] = Bus(7, false, 1, 48, 12.6006383, 75.60382979); //13
     total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
-
-    total_buses[16] = Bus(8, false, 4, 49, 12.74425532, 76.46553191); //14
     total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
-
-    total_buses[18] = Bus(9, false, 4, 50, 12.97212766, 77.83276596); //15
     total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
-
-    total_buses[20] = Bus(10, false, 1, 53, 11.67829787, 70.06978723); //16
     total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
 
+//    // This average is 217 km. 46
+//    total_buses[0] = Bus(0, false, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[1] = Bus(0, true, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[12] = Bus(6, false, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[2] = Bus(1, false, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[3] = Bus(1, true, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[14] = Bus(7, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[4] = Bus(2, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[5] = Bus(2, true, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[16] = Bus(8, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[6] = Bus(3, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[7] = Bus(3, true, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[18] = Bus(9, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[8] = Bus(4, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[9] = Bus(4, true, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This data is from "omlopp 1.xlsx". The average distance is 214 km. 46
+//    total_buses[0] = Bus(0, false, 3, 41, 14.37893617021277, 86.2736170212766);
+//    total_buses[1] = Bus(0, true, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[12] = Bus(6, false, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[2] = Bus(1, false, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[14] = Bus(7, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[4] = Bus(2, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[5] = Bus(2, true, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[16] = Bus(8, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[6] = Bus(3, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[7] = Bus(3, true, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[18] = Bus(9, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[8] = Bus(4, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 211 km. 46
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[14] = Bus(7, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[16] = Bus(8, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[6] = Bus(3, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[7] = Bus(3, true, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[18] = Bus(9, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[8] = Bus(4, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[9] = Bus(4, true, 13, 48, 14.37191489361702, 86.23148936170213);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 210 km. 46
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[14] = Bus(7, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[16] = Bus(8, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[6] = Bus(3, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[7] = Bus(3, true, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[18] = Bus(9, false, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[8] = Bus(4, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[9] = Bus(4, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // The average distance is 208 km. 43
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[14] = Bus(7, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[16] = Bus(8, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[6] = Bus(3, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[7] = Bus(3, true, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[18] = Bus(9, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[8] = Bus(4, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[9] = Bus(4, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // The average distance is 208 km. 18 EVs.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[14] = Bus(7, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[16] = Bus(8, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[6] = Bus(3, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[7] = Bus(3, true, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[18] = Bus(9, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[8] = Bus(4, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[9] = Bus(4, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[20] = Bus(10, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[10] = Bus(5, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 13.27291615, 79.63749687);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 206 km.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[2] = Bus(1, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[3] = Bus(1, true, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[7] = Bus(3, true, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[9] = Bus(4, true, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 206 km. 18 EVs.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[2] = Bus(1, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[3] = Bus(1, true, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[7] = Bus(3, true, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[9] = Bus(4, true, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 13.16219024, 78.97314143);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 204 km. 45
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[14] = Bus(7, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[16] = Bus(8, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[6] = Bus(3, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[7] = Bus(3, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[8] = Bus(4, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[9] = Bus(4, true, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[20] = Bus(10, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[10] = Bus(5, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[11] = Bus(5, true, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 204 km. 18 EVs.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[3] = Bus(1, true, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[14] = Bus(7, false, 4, 45, 13.777021276595743, 82.66212765957447);
+//    total_buses[4] = Bus(2, false, 4, 46, 13.788510638297874, 82.73106382978723);
+//    total_buses[5] = Bus(2, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[16] = Bus(8, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[6] = Bus(3, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[7] = Bus(3, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[8] = Bus(4, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[9] = Bus(4, true, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[20] = Bus(10, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[10] = Bus(5, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[11] = Bus(5, true, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 13.07882419, 78.47294513);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // 203.5629412 km. 43
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[12] = Bus(6, false, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[2] = Bus(1, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[16] = Bus(8, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[6] = Bus(3, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[7] = Bus(3, true, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[18] = Bus(9, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[8] = Bus(4, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[9] = Bus(4, true, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[20] = Bus(10, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[10] = Bus(5, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[11] = Bus(5, true, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // 203.5629412 km. 18 EVs.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 4, 42, 14.401914893617024, 86.41148936170214);
+//    total_buses[12] = Bus(6, false, 2, 42, 14.391702127659576, 86.35021276595744);
+//    total_buses[2] = Bus(1, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[16] = Bus(8, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[6] = Bus(3, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[7] = Bus(3, true, 8, 47, 14.588297872340428, 87.52978723404257);
+//    total_buses[18] = Bus(9, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[8] = Bus(4, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[9] = Bus(4, true, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[20] = Bus(10, false, 10, 49, 14.588297872340428, 87.52978723404257);
+//    total_buses[10] = Bus(5, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[11] = Bus(5, true, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.99337922, 77.96027534);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 202 km. //42
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[16] = Bus(8, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[6] = Bus(3, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[7] = Bus(3, true, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[18] = Bus(9, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[8] = Bus(4, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[9] = Bus(4, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[20] = Bus(10, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[10] = Bus(5, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[11] = Bus(5, true, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 202 km. 18 EVs.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[16] = Bus(8, false, 11, 46, 14.37191489361702, 86.23148936170213);
+//    total_buses[6] = Bus(3, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[7] = Bus(3, true, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[18] = Bus(9, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[8] = Bus(4, false, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[9] = Bus(4, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[20] = Bus(10, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[10] = Bus(5, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[11] = Bus(5, true, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.89590738, 77.37544431);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // 201 km.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[7] = Bus(3, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[8] = Bus(4, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[9] = Bus(4, true, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // 201 km. 18EVs.
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[7] = Bus(3, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[8] = Bus(4, false, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[9] = Bus(4, true, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.83346683, 77.000801);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This data is from "omlopp 2.xlsx". The average distance is 199.6 km. 44
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[7] = Bus(3, true, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // The average is 199.6 km. 18EVs. 48
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[7] = Bus(3, true, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.74173967, 76.45043805);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 199km. 43
+//    total_buses[0] = Bus(0, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[1] = Bus(0, true, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[12] = Bus(6, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[3] = Bus(1, true, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[7] = Bus(3, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[10] = Bus(5, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[11] = Bus(5, true, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 199km. 18 EVs. 45
+//    total_buses[0] = Bus(0, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[1] = Bus(0, true, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[12] = Bus(6, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[3] = Bus(1, true, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[7] = Bus(3, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[10] = Bus(5, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[11] = Bus(5, true, 4, 47, 13.47191489361702, 80.83148936170213);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.72116395, 76.32698373);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 197.6376471 km. 41
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[7] = Bus(3, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[8] = Bus(4, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[9] = Bus(4, true, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[20] = Bus(10, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[10] = Bus(5, false, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[11] = Bus(5, true, 8, 58, 9.485106382978724, 56.91063829787234);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This average is 197.6376471 km. 18 EVs. 47
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 1, 42, 13.930212765957448, 83.5812765957447);
+//    total_buses[12] = Bus(6, false, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[2] = Bus(1, false, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[4] = Bus(2, false, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[5] = Bus(2, true, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[16] = Bus(8, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[6] = Bus(3, false, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[7] = Bus(3, true, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[18] = Bus(9, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[8] = Bus(4, false, 10, 49, 14.303617021276596, 85.82170212765958);
+//    total_buses[9] = Bus(4, true, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[20] = Bus(10, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[10] = Bus(5, false, 10, 53, 13.821702127659574, 82.93021276595745);
+//    total_buses[11] = Bus(5, true, 8, 58, 9.485106382978724, 56.91063829787234);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.61516896, 75.69101377);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // This data is from "omlopp 3.xlsx". The average distance is 195.6 km. 42
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[16] = Bus(8, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[6] = Bus(3, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[7] = Bus(3, true, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 8, 58, 9.485106382978724, 56.91063829787234);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+
+//    // The average is 195.6 km. 18 EVs. 49
+//    total_buses[0] = Bus(0, false, 2, 42, 13.193617021276596, 79.16170212765957);
+//    total_buses[1] = Bus(0, true, 2, 45, 12.744255319148937, 76.46553191489362);
+//    total_buses[12] = Bus(6, false, 3, 45, 13.202553191489361, 79.21531914893617);
+//    total_buses[2] = Bus(1, false, 3, 45, 13.47191489361702, 80.83148936170213);
+//    total_buses[3] = Bus(1, true, 1, 46, 12.871276595744682, 77.2276595744681);
+//    total_buses[14] = Bus(7, false, 1, 46, 12.571914893617024, 75.43148936170213);
+//    total_buses[4] = Bus(2, false, 1, 46, 12.600638297872344, 75.60382978723405);
+//    total_buses[5] = Bus(2, true, 2, 46, 12.972127659574467, 77.8327659574468);
+//    total_buses[16] = Bus(8, false, 3, 47, 12.017872340425534, 72.10723404255319);
+//    total_buses[6] = Bus(3, false, 4, 47, 12.744255319148937, 76.46553191489362);
+//    total_buses[7] = Bus(3, true, 2, 47, 12.57765957446809, 75.46595744680852);
+//    total_buses[18] = Bus(9, false, 4, 48, 12.972127659574467, 77.8327659574468);
+//    total_buses[8] = Bus(4, false, 2, 48, 12.571914893617024, 75.43148936170213);
+//    total_buses[9] = Bus(4, true, 9, 48, 13.19617021276596, 79.17702127659575);
+//    total_buses[20] = Bus(10, false, 1, 51, 11.678297872340426, 70.06978723404256);
+//    total_buses[10] = Bus(5, false, 2, 52, 11.40127659574468, 68.40765957446808);
+//    total_buses[11] = Bus(5, true, 8, 58, 9.485106382978724, 56.91063829787234);
+//    total_buses[13] = Bus(6, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[15] = Bus(7, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[17] = Bus(8, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[19] = Bus(9, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[21] = Bus(10, true, 0, number_time_slot - 1, 100.0, 100.0);
+//    total_buses[22] = Bus(11, true, 0, number_time_slot - 1, 12.48664581, 74.91987484);
+//    total_buses[23] = Bus(11, false, 0, number_time_slot - 1, 100.0, 100.0);
 
     memset(fixed_decisions, -1, sizeof(fixed_decisions));
 }
@@ -411,7 +1097,6 @@ void get_min_reduced_cost_add_the_column_fixed_version(int BN, int t_star) // BN
                         graph.InputAdjMat(node + (t - 1) * n, node + t * n + 3, - pi_1c[total_buses[BN].CN][total_buses[BN].ATS + t] - 3 * pi_1e[total_buses[BN].ATS + t]);
                 }
             }
-
         for (int i = 0; i < n; ++i)
             graph.InputAdjMat((m - 1) * n + 1 + i, m * n + 1, (total_buses[BN].RSoC - node_corresponding_SoC[i] ) < 0? 0 : (total_buses[BN].RSoC - node_corresponding_SoC[i]));
     }
@@ -662,7 +1347,7 @@ void how_many_unfixed()
         for (int j = 0; j < number_time_slot; ++j)
             if (fixed_decisions[i][j] != -1)
                 counter++;
-    how_many = counter;
+    how_many_fixed = counter;
 }
 
 void remove_violating_columns()
@@ -756,7 +1441,7 @@ int main()
     std::cout <<"\nNow finding the minimal t_star for RCGA via step-by-step: "<<std::endl;
 
     // step-by-step to find the feasible minimal t
-    for (int t_star = tT; t_star < number_time_slot - 1; t_star++)
+    for (int t_star = tT; t_star < number_time_slot; t_star++)
     {
         model.reset();
         for (int i = 0; i < number_bus; ++i)
@@ -833,7 +1518,7 @@ int main()
             {
                 remove_violating_columns();
                 resolve_LP();
-                std::cout<<"When t* = "<<t_star<<", RCGA gets ObjValue that is "<< model.getObjValue()<<std::endl; // in case...
+                std::cout<<"When t* = "<<t_star<<", RCGA gets ObjValue that is "<< model.getObjValue()<<std::endl;
                 break;
             }
 
@@ -868,24 +1553,6 @@ int main()
         if (model.getObjValue() == 0)
             break;
     }
-
-
-//        // To store the solution: start //
-//        std::vector<column_information> solution_columns;
-//        int ccc = 0;
-//        for (int i = 0; i < problem_columns.size(); ++i)
-//        {
-//            if (abs(chi[i] - 1) < 1e-6)
-//            {
-//                solution_columns.push_back(problem_columns[i]);
-//                ccc++;
-//            }
-//        }
-//        std::sort(solution_columns.begin(), solution_columns.end(), cmp_solution);
-//        for (int i = 0; i < solution_columns.size(); ++i)
-//            std::cout<<"BN: "<<solution_columns[i].BN<<", ColN: "<<solution_columns[i].ColN<<", Delta: "<<solution_columns[i].delta<<std::endl;
-//        // To store the solution: end //
-
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = (end - start).count();

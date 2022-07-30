@@ -57,5 +57,10 @@ public:
     round_indicator(int BN, int t, int rate, double probability);
 };
 
+class csvdata
+{
+public:
+    
+};
 
 #endif //EV_PROJECT_BUS_H
