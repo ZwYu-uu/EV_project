@@ -51,22 +51,22 @@ build cmake_object_order_depends_target_EV_project: phony || CMakeFiles/EV_proje
 
 build CMakeFiles/EV_project.dir/main.cpp.o: CXX_COMPILER__EV_project_Debug /Users/ZwYu/CLionProjects/EV_project/main.cpp || cmake_object_order_depends_target_EV_project
   DEP_FILE = CMakeFiles/EV_project.dir/main.cpp.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -std=gnu++14
-  INCLUDES = -I/Users/ZwYu/dist/include/coin-or
+  FLAGS = -g -std=gnu++14
+  INCLUDES = -I/Users/ZwYu/CLionProjects/EV_project/coin-or
   OBJECT_DIR = CMakeFiles/EV_project.dir
   OBJECT_FILE_DIR = CMakeFiles/EV_project.dir
 
 build CMakeFiles/EV_project.dir/SPFA.cpp.o: CXX_COMPILER__EV_project_Debug /Users/ZwYu/CLionProjects/EV_project/SPFA.cpp || cmake_object_order_depends_target_EV_project
   DEP_FILE = CMakeFiles/EV_project.dir/SPFA.cpp.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -std=gnu++14
-  INCLUDES = -I/Users/ZwYu/dist/include/coin-or
+  FLAGS = -g -std=gnu++14
+  INCLUDES = -I/Users/ZwYu/CLionProjects/EV_project/coin-or
   OBJECT_DIR = CMakeFiles/EV_project.dir
   OBJECT_FILE_DIR = CMakeFiles/EV_project.dir
 
 build CMakeFiles/EV_project.dir/Bus.cpp.o: CXX_COMPILER__EV_project_Debug /Users/ZwYu/CLionProjects/EV_project/Bus.cpp || cmake_object_order_depends_target_EV_project
   DEP_FILE = CMakeFiles/EV_project.dir/Bus.cpp.o.d
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk -std=gnu++14
-  INCLUDES = -I/Users/ZwYu/dist/include/coin-or
+  FLAGS = -g -std=gnu++14
+  INCLUDES = -I/Users/ZwYu/CLionProjects/EV_project/coin-or
   OBJECT_DIR = CMakeFiles/EV_project.dir
   OBJECT_FILE_DIR = CMakeFiles/EV_project.dir
 
@@ -79,9 +79,9 @@ build CMakeFiles/EV_project.dir/Bus.cpp.o: CXX_COMPILER__EV_project_Debug /Users
 # Link the executable EV_project
 
 build EV_project: CXX_EXECUTABLE_LINKER__EV_project_Debug CMakeFiles/EV_project.dir/main.cpp.o CMakeFiles/EV_project.dir/SPFA.cpp.o CMakeFiles/EV_project.dir/Bus.cpp.o
-  FLAGS = -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.3.sdk
-  LINK_LIBRARIES = -Wl,-rpath,/Users/ZwYu/dist/lib  -lClp  -lCoinUtils  -lOsi  -lOsiClp  -lOsiCommonTest  -lCbc  -lCgl  -lOsiCbc
-  LINK_PATH = -L/Users/ZwYu/dist/lib
+  FLAGS = -g
+  LINK_LIBRARIES = -Wl,-rpath,/Users/ZwYu/CLionProjects/EV_project/lib  -lClp  -lCoinUtils  -lOsi  -lOsiClp  -lOsiCommonTest  -lCbc  -lCgl  -lOsiCbc
+  LINK_PATH = -L/Users/ZwYu/CLionProjects/EV_project/lib
   OBJECT_DIR = CMakeFiles/EV_project.dir
   POST_BUILD = :
   PRE_LINK = :

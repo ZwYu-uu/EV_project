@@ -5,9 +5,8 @@
 #ifndef EV_PROJECT_PARAMETERS_H
 #define EV_PROJECT_PARAMETERS_H
 
-//#define number_bus 2 // 6 * 2 + 5 + (dummy: 5)
 #define number_bus 22 // 6 * 2 + 5 + (dummy: 5)
-//#define number_bus 24 // 6 * 2 + 5 + (dummy: 5)
+//#define number_bus 24 // 6 * 2 + 6 + (dummy: 6)
 #define number_charger number_bus/2
 #define number_time_slot 56 // 18:00 ~ 8:00 = 14 hours; 56 = 14h / 15min
 //#define number_time_slot 60 // 18:00 ~ 8:00 = 14 hours; 56 = 14h / 15min
